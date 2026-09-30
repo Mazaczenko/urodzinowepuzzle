@@ -1,11 +1,6 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import GameLayout from '@/Layouts/GameLayout.vue';
+import { Head, useForm } from '@inertiajs/vue3';
 
 defineProps({
     canResetPassword: {
@@ -19,7 +14,8 @@ defineProps({
 const form = useForm({
     email: '',
     password: '',
-    remember: false,
+    // Stay logged in by default, so the session does not run out halfway through the game.
+    remember: true,
 });
 
 const submit = () => {
@@ -30,71 +26,62 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Log in" />
+    <GameLayout>
+        <Head title="Logowanie" />
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
-            {{ status }}
-        </div>
+        <main class="flex flex-1 items-center justify-center px-4 py-10">
+            <div class="glass-card w-full max-w-md px-6 py-9 sm:px-9">
+                <div class="text-center">
+                    <div class="text-5xl" aria-hidden="true">🧩</div>
+                    <h1 class="mt-3 font-display text-3xl font-bold text-gold-300">Urodzinowe puzzle</h1>
+                    <p class="mt-2 text-white/70">Zaloguj się, żeby odebrać niespodziankę.</p>
+                </div>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+                <div v-if="status" class="mt-4 text-center text-sm font-medium text-gold-300">
+                    {{ status }}
+                </div>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                <form class="mt-7 space-y-5" @submit.prevent="submit">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-white/80">E-mail</label>
+                        <input
+                            id="email"
+                            v-model="form.email"
+                            type="email"
+                            class="mt-1 block w-full rounded-xl border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 focus:border-gold-300 focus:ring-gold-300"
+                            required
+                            autofocus
+                            autocomplete="username"
+                        />
+                        <p v-if="form.errors.email" class="mt-2 text-sm text-pink-300">{{ form.errors.email }}</p>
+                    </div>
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-white/80">Hasło</label>
+                        <input
+                            id="password"
+                            v-model="form.password"
+                            type="password"
+                            class="mt-1 block w-full rounded-xl border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 focus:border-gold-300 focus:ring-gold-300"
+                            required
+                            autocomplete="current-password"
+                        />
+                        <p v-if="form.errors.password" class="mt-2 text-sm text-pink-300">{{ form.errors.password }}</p>
+                    </div>
+
+                    <label class="flex items-center gap-2 text-sm text-white/70">
+                        <input
+                            v-model="form.remember"
+                            type="checkbox"
+                            name="remember"
+                            class="rounded border-white/30 bg-white/10 text-gold-500 focus:ring-gold-300 focus:ring-offset-night-900"
+                        />
+                        Zapamiętaj mnie
+                    </label>
+
+                    <button type="submit" class="btn-gold w-full" :disabled="form.processing">Wchodzę</button>
+                </form>
             </div>
-
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
-
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4 block">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400"
-                        >Remember me</span
-                    >
-                </label>
-            </div>
-
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
-                >
-                    Forgot your password?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Log in
-                </PrimaryButton>
-            </div>
-        </form>
-    </GuestLayout>
+        </main>
+    </GameLayout>
 </template>
