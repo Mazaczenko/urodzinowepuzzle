@@ -1,0 +1,78 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - navigation [ref=f1e5]:
+        - button "Menu użytkownika" [ref=f1e9] [cursor=pointer]:
+          - img "Awatar tmp" [ref=f1e10]
+      - main [ref=f1e11]:
+        - generic [ref=f1e13]:
+          - heading "Panel" [level=1] [ref=f1e16]
+          - generic [ref=f1e19]:
+            - generic [ref=f1e24]:
+              - img "Awatar tmp" [ref=f1e25]
+              - generic [ref=f1e26]:
+                - heading "Witaj" [level=2] [ref=f1e27]
+                - paragraph [ref=f1e28]: tmp
+              - button "Wyloguj się" [ref=f1e30] [cursor=pointer]
+            - generic [ref=f1e36]:
+              - heading "Postęp gracza" [level=3] [ref=f1e42]
+              - generic [ref=f1e45]:
+                - generic [ref=f1e46]:
+                  - generic [ref=f1e47]:
+                    - generic [ref=f1e48]: Gracz
+                    - generic [ref=f1e49]: M. Kobyliński
+                  - generic [ref=f1e50]:
+                    - generic [ref=f1e51]: Poziom
+                    - generic [ref=f1e52]: 1 / 9
+                  - generic [ref=f1e53]:
+                    - generic [ref=f1e54]: Rozpoczęta
+                    - generic [ref=f1e55]: 30.09.2026 22:46
+                  - generic [ref=f1e56]:
+                    - generic [ref=f1e57]: Ukończona
+                    - generic [ref=f1e58]: —
+                - generic [ref=f1e59]:
+                  - generic [ref=f1e60]:
+                    - generic [ref=f1e61]: Obrazek 1
+                    - generic [ref=f1e62]: —
+                  - generic [ref=f1e63]:
+                    - generic [ref=f1e64]: Obrazek 2
+                    - generic [ref=f1e65]: —
+                  - generic [ref=f1e66]:
+                    - generic [ref=f1e67]: Obrazek 3
+                    - generic [ref=f1e68]: —
+                  - generic [ref=f1e69]:
+                    - generic [ref=f1e70]: Obrazek 4
+                    - generic [ref=f1e71]: —
+                  - generic [ref=f1e72]:
+                    - generic [ref=f1e73]: Obrazek 5
+                    - generic [ref=f1e74]: —
+                  - generic [ref=f1e75]:
+                    - generic [ref=f1e76]: Obrazek 6
+                    - generic [ref=f1e77]: —
+                  - generic [ref=f1e78]:
+                    - generic [ref=f1e79]: Obrazek 7
+                    - generic [ref=f1e80]: —
+                  - generic [ref=f1e81]:
+                    - generic [ref=f1e82]: Obrazek 8
+                    - generic [ref=f1e83]: —
+                  - generic [ref=f1e84]:
+                    - generic [ref=f1e85]: Obrazek 9
+                    - generic [ref=f1e86]: —
+    - complementary [ref=f1e87]:
+      - link "Urodzinowe Puzzle" [ref=f1e91] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin
+      - navigation [ref=f1e93]:
+        - list [ref=f1e94]:
+          - listitem [ref=f1e95]:
+            - list [ref=f1e96]:
+              - listitem [ref=f1e97]:
+                - link "Panel" [ref=f1e98] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin
+              - listitem [ref=f1e102]:
+                - link "Ułóż puzzle" [ref=f1e103] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/preview/1
+              - listitem [ref=f1e107]:
+                - link "Gry" [ref=f1e108] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/games
+  - generic:
+    - status

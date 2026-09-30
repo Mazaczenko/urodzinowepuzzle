@@ -52,7 +52,7 @@ const shownSolved = ref(props.solvedCount);
 
 // lead (text before the level, if any) → playing → merging (picture slides together)
 // → merged (message shows) → saved (progress is stored)
-const startPhase = (puzzle) => (puzzle.leadMessage ? 'lead' : 'playing');
+const startPhase = (puzzle) => (puzzle.title || puzzle.leadMessage ? 'lead' : 'playing');
 const phase = ref(startPhase(props.puzzle));
 const submitting = ref(false);
 const failed = ref(false);
@@ -201,7 +201,14 @@ onBeforeUnmount(() => stopSound());
                             <p class="text-sm font-medium uppercase tracking-widest text-gold-300">
                                 Etap {{ board.number }} z {{ totalPuzzles }}
                             </p>
+                            <h2
+                                v-if="board.title"
+                                class="font-display text-3xl font-bold leading-tight text-gold-300 sm:text-5xl"
+                            >
+                                {{ board.title }}
+                            </h2>
                             <p
+                                v-if="board.leadMessage"
                                 class="min-h-0 overflow-y-auto whitespace-pre-line font-display text-xl leading-relaxed text-white sm:text-3xl"
                             >
                                 {{ board.leadMessage }}

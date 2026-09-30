@@ -47,6 +47,10 @@ class PuzzlesRelationManager extends RelationManager
                     ->maxSize(12288)
                     ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => Puzzle::storeImage($file))
                     ->required(),
+                Forms\Components\TextInput::make('title')
+                    ->label('Hasło przed ułożeniem')
+                    ->helperText('Opcjonalne. Duży napis na ekranie przed ułożeniem obrazka, np. „Graj o bidon”.')
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('lead_message')
                     ->label('Tekst przed ułożeniem')
                     ->helperText('Opcjonalny. Pokaże się na początku etapu, zanim puzzle się rozsypią, np. zagadka, co będzie na obrazku.')
@@ -85,6 +89,9 @@ class PuzzlesRelationManager extends RelationManager
                     Tables\Columns\TextColumn::make('position')
                         ->formatStateUsing(fn (int $state): string => 'Obrazek '.$state)
                         ->weight('bold'),
+                    Tables\Columns\TextColumn::make('title')
+                        ->formatStateUsing(fn (string $state): string => 'Hasło: '.$state)
+                        ->color('warning'),
                     Tables\Columns\TextColumn::make('lead_message')
                         ->formatStateUsing(fn (string $state): string => 'Przed: '.$state)
                         ->limit(120)

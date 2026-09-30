@@ -1,0 +1,40 @@
+- generic [active] [ref=f12e1]:
+  - generic [ref=f12e2]:
+    - button "Drukuj / zapisz PDF" [ref=f12e3] [cursor=pointer]
+    - link "Wróć do panelu" [ref=f12e4] [cursor=pointer]:
+      - /url: http://127.0.0.1:8000/admin
+  - paragraph [ref=f12e5]: Format A5 poziomo. W oknie drukowania włącz „Grafika tła”, żeby zachować kolor papieru.
+  - article [ref=f12e6]:
+    - generic [ref=f12e7]:
+      - generic [ref=f12e8]:
+        - strong [ref=f12e9]: Urząd telegraficzny
+        - text: Fortis · okienko nr 62 Druk Tg-1
+      - heading "TELEGRAM" [level=1] [ref=f12e10]
+      - generic [ref=f12e11]:
+        - generic [ref=f12e12]: Nr nadania
+        - generic [ref=f12e13]: "0062"
+        - generic [ref=f12e14]: Słów
+        - generic [ref=f12e15]: "13"
+        - generic [ref=f12e16]: Dnia
+        - generic [ref=f12e17]: 01.10.2026
+        - generic [ref=f12e18]: Godz.
+        - generic [ref=f12e19]: "01.45"
+    - generic [ref=f12e20]:
+      - generic [ref=f12e21]: Adresat
+      - generic [ref=f12e22]: OB. M. KOBYLIŃSKI
+      - generic [ref=f12e23]: Nadawca
+      - generic [ref=f12e24]: EKIPA FORTIS
+    - generic [ref=f12e25]:
+      - generic [ref=f12e26]:
+        - generic [ref=f12e27]: Treść
+        - paragraph [ref=f12e29]: WSZYSTKIEGO NAJLEPSZEGO STOP ZESKANUJ KOD OBOK STOP CZEKA NA CIEBIE NIESPODZIANKA STOP UŁÓŻ WSZYSTKO DO KOŃCA STOP
+      - generic [ref=f12e30]:
+        - generic [ref=f12e31]: Załącznik — pilne
+        - generic [ref=f12e36]: Zeskanuj telefonem
+    - generic [ref=f12e37]:
+      - generic [ref=f12e38]: Za treść telegramu urząd nie odpowiada · Doręczyć do rąk własnych
+      - generic [ref=f12e39]: Podpis przyjmującego
+    - img [aria-hidden]:
+      - generic: URZĄD TELEGRAFICZNY ✶ FORTIS ✶
+      - generic: 01.10.2026
+      - generic: 62 LATA

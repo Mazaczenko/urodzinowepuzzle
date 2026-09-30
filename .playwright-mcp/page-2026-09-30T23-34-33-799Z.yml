@@ -1,0 +1,252 @@
+- generic [active] [ref=f5e1]:
+  - generic [ref=f5e2]:
+    - generic [ref=f5e3]:
+      - navigation [ref=f5e5]:
+        - button "Menu użytkownika" [ref=f5e9] [cursor=pointer]:
+          - img "Awatar tmp" [ref=f5e10]
+      - main [ref=f5e11]:
+        - generic [ref=f5e13]:
+          - generic [ref=f5e14]:
+            - generic [ref=f5e15]:
+              - navigation [ref=f5e16]:
+                - list [ref=f5e17]:
+                  - listitem [ref=f5e18]:
+                    - link "Gry" [ref=f5e19] [cursor=pointer]:
+                      - /url: http://127.0.0.1:8000/admin/games
+                  - listitem [ref=f5e20]:
+                    - generic [ref=f5e23]: Edytuj
+              - heading "Edytuj Gra" [level=1] [ref=f5e24]
+            - generic [ref=f5e26]:
+              - link "Podgląd jako gracz" [ref=f5e27] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/preview/1
+              - button "Kod QR" [ref=f5e34] [cursor=pointer]
+              - button "Resetuj postęp" [ref=f5e39] [cursor=pointer]
+              - button "Usuń" [ref=f5e43] [cursor=pointer]
+          - generic [ref=f5e46]:
+            - generic [ref=f5e49]:
+              - heading "Postęp gracza" [level=3] [ref=f5e338]
+              - generic [ref=f5e339]:
+                - generic [ref=f5e340]:
+                  - generic [ref=f5e341]:
+                    - generic [ref=f5e342]: Gracz
+                    - generic [ref=f5e343]: M. Kobyliński
+                  - generic [ref=f5e344]:
+                    - generic [ref=f5e345]: Poziom
+                    - generic [ref=f5e346]: 1 / 9
+                  - generic [ref=f5e347]:
+                    - generic [ref=f5e348]: Rozpoczęta
+                    - generic [ref=f5e349]: 30.09.2026 22:46
+                  - generic [ref=f5e350]:
+                    - generic [ref=f5e351]: Ukończona
+                    - generic [ref=f5e352]: —
+                - generic [ref=f5e353]:
+                  - generic [ref=f5e354]:
+                    - generic [ref=f5e355]: Obrazek 1
+                    - generic [ref=f5e356]: —
+                  - generic [ref=f5e357]:
+                    - generic [ref=f5e358]: Obrazek 2
+                    - generic [ref=f5e359]: —
+                  - generic [ref=f5e360]:
+                    - generic [ref=f5e361]: Obrazek 3
+                    - generic [ref=f5e362]: —
+                  - generic [ref=f5e363]:
+                    - generic [ref=f5e364]: Obrazek 4
+                    - generic [ref=f5e365]: —
+                  - generic [ref=f5e366]:
+                    - generic [ref=f5e367]: Obrazek 5
+                    - generic [ref=f5e368]: —
+                  - generic [ref=f5e369]:
+                    - generic [ref=f5e370]: Obrazek 6
+                    - generic [ref=f5e371]: —
+                  - generic [ref=f5e372]:
+                    - generic [ref=f5e373]: Obrazek 7
+                    - generic [ref=f5e374]: —
+                  - generic [ref=f5e375]:
+                    - generic [ref=f5e376]: Obrazek 8
+                    - generic [ref=f5e377]: —
+                  - generic [ref=f5e378]:
+                    - generic [ref=f5e379]: Obrazek 9
+                    - generic [ref=f5e380]: —
+            - generic [ref=f5e52]:
+              - generic [ref=f5e53]:
+                - generic [ref=f5e55]:
+                  - heading "Gracz" [level=3] [ref=f5e59]
+                  - generic [ref=f5e65]:
+                    - generic [ref=f5e68]:
+                      - text: Gracz
+                      - superscript [ref=f5e69]: "*"
+                    - combobox "Gracz*" [ref=f5e73]:
+                      - option "Wybierz z listy"
+                      - option "M. Kobyliński" [selected]
+                - generic [ref=f5e75]:
+                  - generic [ref=f5e78]:
+                    - heading "Trudność" [level=3] [ref=f5e79]
+                    - paragraph [ref=f5e80]: Na ile kawałków jest cięty każdy obrazek.
+                  - generic [ref=f5e85]:
+                    - generic [ref=f5e86]: Difficulty
+                    - generic [ref=f5e89]:
+                      - generic [ref=f5e91]:
+                        - radio "Łatwy Każdy obrazek ma 10 kawałków, a w ramce cały czas widać podpowiedź." [ref=f5e92]
+                        - generic [ref=f5e93]:
+                          - generic [ref=f5e94]: Łatwy
+                          - paragraph [ref=f5e95]: Każdy obrazek ma 10 kawałków, a w ramce cały czas widać podpowiedź.
+                      - generic [ref=f5e97]:
+                        - radio "Rosnący Obrazki 1–3 po 10 kawałków, 4–6 po 15, 7–9 po 18. Podpowiedź w ramce słabnie i na koniec znika. Domyślny." [checked] [ref=f5e98]
+                        - generic [ref=f5e99]:
+                          - generic [ref=f5e100]: Rosnący
+                          - paragraph [ref=f5e101]: Obrazki 1–3 po 10 kawałków, 4–6 po 15, 7–9 po 18. Podpowiedź w ramce słabnie i na koniec znika. Domyślny.
+                      - generic [ref=f5e103]:
+                        - radio "Trudny Obrazki 1–3 po 15 kawałków, 4–6 po 18, 7–9 po 24. Podpowiedź tylko na początku." [ref=f5e104]
+                        - generic [ref=f5e105]:
+                          - generic [ref=f5e106]: Trudny
+                          - paragraph [ref=f5e107]: Obrazki 1–3 po 15 kawałków, 4–6 po 18, 7–9 po 24. Podpowiedź tylko na początku.
+                - generic [ref=f5e109]:
+                  - generic [ref=f5e112]:
+                    - heading "Wygląd" [level=3] [ref=f5e113]
+                    - paragraph [ref=f5e114]: Styl ekranów gry, od logowania po finał. W podglądzie można szybko porównać style bez zapisywania.
+                  - generic [ref=f5e119]:
+                    - generic [ref=f5e120]: Theme
+                    - generic [ref=f5e123]:
+                      - generic [ref=f5e125]:
+                        - 'radio "Fortis Kolory fortis.pl: granat i limonka, font Ubuntu. Domyślny." [checked] [ref=f5e126]'
+                        - generic [ref=f5e127]:
+                          - generic [ref=f5e128]: Fortis
+                          - paragraph [ref=f5e129]: "Kolory fortis.pl: granat i limonka, font Ubuntu. Domyślny."
+                      - generic [ref=f5e131]:
+                        - radio "Nocne niebo Granatowo-fioletowe niebo, złoto i gwiazdy." [ref=f5e132]
+                        - generic [ref=f5e133]:
+                          - generic [ref=f5e134]: Nocne niebo
+                          - paragraph [ref=f5e135]: Granatowo-fioletowe niebo, złoto i gwiazdy.
+                      - generic [ref=f5e137]:
+                        - radio "Warcaby Czarno-biała szachownica jak flaga wyścigowa, z czerwonymi akcentami." [ref=f5e138]
+                        - generic [ref=f5e139]:
+                          - generic [ref=f5e140]: Warcaby
+                          - paragraph [ref=f5e141]: Czarno-biała szachownica jak flaga wyścigowa, z czerwonymi akcentami.
+                - generic [ref=f5e143]:
+                  - generic [ref=f5e146]:
+                    - heading "Teksty" [level=3] [ref=f5e147]
+                    - paragraph [ref=f5e148]: Oba pojawiają się pisane litera po literze.
+                  - generic [ref=f5e151]:
+                    - generic [ref=f5e154]:
+                      - generic [ref=f5e155]: Tekst na początek
+                      - generic [ref=f5e158]:
+                        - generic [ref=f5e161]:
+                          - generic [ref=f5e163]:
+                            - generic [ref=f5e164]:
+                              - button "Pogrubienie" [ref=f5e165] [cursor=pointer]
+                              - button "Kursywa" [ref=f5e168] [cursor=pointer]
+                              - button "Podkreślenie" [ref=f5e171] [cursor=pointer]
+                              - button "Przekreślenie" [ref=f5e174] [cursor=pointer]
+                            - generic [ref=f5e177]:
+                              - button "Nagłówek" [ref=f5e178] [cursor=pointer]
+                              - button "Podtytuł" [disabled] [ref=f5e181] [cursor=pointer]
+                            - generic [ref=f5e184]:
+                              - button "Lista punktowana" [disabled] [ref=f5e185] [cursor=pointer]
+                              - button "Lista numerowana" [disabled] [ref=f5e188] [cursor=pointer]
+                            - generic [ref=f5e191]:
+                              - button "Cofnij" [disabled] [ref=f5e192] [cursor=pointer]
+                              - button "Ponów" [disabled] [ref=f5e195] [cursor=pointer]
+                          - textbox [ref=f5e198]:
+                            - heading "Wszystkiego najlepszego na 62 urodziny, Szefie!!!!!" [level=2] [ref=f5e199]
+                            - paragraph [ref=f5e200]: Wiemy, że w zarządzaniu Fortisem składasz wszystko w idealną całość... ale... Dzisiaj sprawdzimy Twoje umiejętności na wirtualnym torze przeszkód! Ekipa zrzuciła się na konkretne dofinansowanie do Twojego marzenia, które mocno przyspieszy Twoje tętno(i nie jest to raport kwartalny)
+                            - paragraph [ref=f5e201]: Ułóż puzzle, odkryj do czego chcielibyśmy się dołożyć! 🧩
+                        - generic [ref=f5e202]: Ekran startowy, zanim gracz zacznie układać, np. życzenia i zaproszenie do gry.
+                    - generic [ref=f5e205]:
+                      - generic [ref=f5e206]: Tekst na zakończenie
+                      - generic [ref=f5e209]:
+                        - generic [ref=f5e212]:
+                          - generic [ref=f5e214]:
+                            - generic [ref=f5e215]:
+                              - button "Pogrubienie" [ref=f5e216] [cursor=pointer]
+                              - button "Kursywa" [ref=f5e219] [cursor=pointer]
+                              - button "Podkreślenie" [ref=f5e222] [cursor=pointer]
+                              - button "Przekreślenie" [ref=f5e225] [cursor=pointer]
+                            - generic [ref=f5e228]:
+                              - button "Nagłówek" [ref=f5e229] [cursor=pointer]
+                              - button "Podtytuł" [disabled] [ref=f5e232] [cursor=pointer]
+                            - generic [ref=f5e235]:
+                              - button "Lista punktowana" [disabled] [ref=f5e236] [cursor=pointer]
+                              - button "Lista numerowana" [disabled] [ref=f5e239] [cursor=pointer]
+                            - generic [ref=f5e242]:
+                              - button "Cofnij" [disabled] [ref=f5e243] [cursor=pointer]
+                              - button "Ponów" [disabled] [ref=f5e246] [cursor=pointer]
+                          - textbox [ref=f5e249]:
+                            - heading "Szefie, to Twój nowy rower! 🚲⚡" [level=2] [ref=f5e250]
+                            - paragraph [ref=f5e251]: Cała ekipa Fortisu zrzuciła się na konkretne dofinansowanie do Twojego wymarzonego e-roweru. Niech każdy kilometr daje tyle frajdy, co ułożenie tych puzzli!
+                            - paragraph [ref=f5e252]: Sto lat, szerokiej drogi i wiatru zawsze w plecy! 🎉
+                        - generic [ref=f5e253]: Finał z fajerwerkami, po ułożeniu wszystkich obrazków.
+                - generic [ref=f5e255]:
+                  - heading "Muzyka" [level=3] [ref=f5e259]
+                  - generic [ref=f5e262]:
+                    - generic [ref=f5e265]:
+                      - generic [ref=f5e266]: Muzyka w trakcie gry
+                      - generic [ref=f5e269]:
+                        - group "Muzyka w trakcie gry" [ref=f5e270]:
+                          - generic [ref=f5e381]:
+                            - button "Przeciągnij i upuść lub wybierz pliki" [ref=f5e382]
+                            - list [ref=f5e384]:
+                              - listitem [ref=f5e385]:
+                                - group "01M3SZVYQD1RWXDMKNK671GG9R.mp3" [ref=f5e386]:
+                                  - generic [ref=f5e388]:
+                                    - button "Usuń" [ref=f5e389]
+                                    - generic:
+                                      - generic [aria-hidden]: 01M3SZVYQD1RWXDMKNK671GG9R.mp3
+                                      - generic: 5.4 MB
+                                    - generic [ref=f5e395] [cursor=pointer]
+                            - alert [ref=f5e398]
+                        - generic [ref=f5e273]: MP3 do 30 MB, gra w pętli przez wszystkie obrazki.
+                    - generic [ref=f5e276]:
+                      - generic [ref=f5e277]: Muzyka na finał
+                      - generic [ref=f5e280]:
+                        - group "Muzyka na finał" [ref=f5e281]:
+                          - generic [ref=f5e399]:
+                            - button "Przeciągnij i upuść lub wybierz pliki" [ref=f5e400]
+                            - list [ref=f5e402]:
+                              - listitem [ref=f5e403]:
+                                - group "01M3SZVYQNNBPC7M1J7HGV8YVP.mp3" [ref=f5e404]:
+                                  - generic [ref=f5e406]:
+                                    - button "Usuń" [ref=f5e407]
+                                    - generic:
+                                      - generic [aria-hidden]: 01M3SZVYQNNBPC7M1J7HGV8YVP.mp3
+                                      - generic: 2.4 MB
+                                    - generic [ref=f5e413] [cursor=pointer]
+                            - alert [ref=f5e416]
+                        - generic [ref=f5e284]: MP3 do 30 MB, płynnie zastępuje muzykę z gry po ułożeniu ostatniego obrazka, razem z fajerwerkami.
+                    - generic [ref=f5e287]:
+                      - generic [ref=f5e288]: Dźwięk po ułożeniu obrazka
+                      - generic [ref=f5e291]:
+                        - group "Dźwięk po ułożeniu obrazka" [ref=f5e292]:
+                          - generic [ref=f5e417]:
+                            - button "Przeciągnij i upuść lub wybierz pliki" [ref=f5e418]
+                            - list [ref=f5e420]:
+                              - listitem [ref=f5e421]:
+                                - group "01M3SZVYQRF74RSVPGQ9AXZ1YD.mp3" [ref=f5e422]:
+                                  - generic [ref=f5e424]:
+                                    - button "Usuń" [ref=f5e425]
+                                    - generic:
+                                      - generic [aria-hidden]: 01M3SZVYQRF74RSVPGQ9AXZ1YD.mp3
+                                      - generic: 36 KB
+                                    - generic [ref=f5e431] [cursor=pointer]
+                            - alert [ref=f5e434]
+                        - generic [ref=f5e295]: MP3 do 30 MB, gra po ułożeniu każdego obrazka oprócz ostatniego (po nim wchodzi muzyka na finał). Muzyka w tle na ten czas cichnie.
+              - generic [ref=f5e297]:
+                - button "Zapisz" [ref=f5e298] [cursor=pointer]
+                - button "Anuluj" [ref=f5e300] [cursor=pointer]
+    - complementary [ref=f5e308]:
+      - link "Urodzinowe Puzzle" [ref=f5e312] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin
+      - navigation [ref=f5e314]:
+        - list [ref=f5e315]:
+          - listitem [ref=f5e316]:
+            - list [ref=f5e317]:
+              - listitem [ref=f5e318]:
+                - link "Panel" [ref=f5e319] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin
+              - listitem [ref=f5e323]:
+                - link "Ułóż puzzle" [ref=f5e324] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/preview/1
+              - listitem [ref=f5e328]:
+                - link "Gry" [ref=f5e329] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/games
+  - generic:
+    - status

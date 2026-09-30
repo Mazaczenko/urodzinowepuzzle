@@ -1,0 +1,43 @@
+- generic [ref=f2e3]:
+  - generic [aria-hidden]:
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+  - generic [ref=f2e4]:
+    - text: Podgląd — postęp gracza nie jest zapisywany, a zmiana stylu jest tylko na próbę.
+    - link "Wróć do panelu" [ref=f2e5] [cursor=pointer]:
+      - /url: /admin
+  - generic [ref=f2e7]:
+    - banner [ref=f2e8]:
+      - generic [ref=f2e10]:
+        - text: Poziom
+        - strong [ref=f2e11]: "4"
+        - generic [ref=f2e12]: / 9
+      - 'group "Ułożone obrazki: 3 z 9" [ref=f2e13]':
+        - generic [aria-hidden] [ref=f2e15]: 🧩
+        - generic [aria-hidden] [ref=f2e17]: 🧩
+        - generic [aria-hidden] [ref=f2e19]: 🧩
+        - generic [aria-hidden] [ref=f2e21]: "4"
+        - generic [aria-hidden] [ref=f2e23]: "5"
+        - generic [aria-hidden] [ref=f2e25]: "6"
+        - generic [aria-hidden] [ref=f2e27]: "7"
+        - generic [aria-hidden] [ref=f2e29]: "8"
+        - generic [aria-hidden] [ref=f2e31]: "9"
+      - generic [ref=f2e32]:
+        - button "Zmień styl" [ref=f2e34] [cursor=pointer]
+        - button "Wycisz muzykę!" [ref=f2e40] [cursor=pointer]
+    - main [ref=f2e45]:
+      - generic [ref=f2e47]:
+        - paragraph [ref=f2e48]: Etap 4 z 9
+        - heading "Zadbaj o oświecenie" [level=2] [ref=f2e49]
+        - paragraph [ref=f2e50]: Bez tego daleko nie zajedziesz. A na pewno nie z przodu.
+        - button "Układam 🧩" [ref=f2e51] [cursor=pointer]

@@ -151,7 +151,8 @@ class Game extends Model
      */
     /**
      * The link that logs the player straight in, for the QR code. Anyone holding it can play,
-     * so a new token can be generated to make the old link and code stop working.
+     * so a new token can be generated to make the old link and code stop working. It always points
+     * at the player's address (config app.player_url), not the host the admin panel is open on.
      */
     public function loginUrl(): string
     {
@@ -159,7 +160,7 @@ class Game extends Model
             $this->regenerateLoginToken();
         }
 
-        return route('game.qr-login', $this->login_token);
+        return rtrim(config('app.player_url'), '/').route('game.qr-login', $this->login_token, absolute: false);
     }
 
     public function regenerateLoginToken(): void
@@ -167,9 +168,12 @@ class Game extends Model
         $this->forceFill(['login_token' => Str::random(40)])->save();
     }
 
+    /**
+     * The QR code in dark ink on the telegram's yellowed paper.
+     */
     public function loginQrSvg(int $size = 320): string
     {
-        return (new Writer(new ImageRenderer(new RendererStyle($size, 2), new SvgImageBackEnd)))->writeString($this->loginUrl());
+        return (new Writer(new ImageRenderer(new RendererStyle($size, 2, fill: self::telegramQrFill()), new SvgImageBackEnd)))->writeString($this->loginUrl());
     }
 
     /**
@@ -183,11 +187,19 @@ class Game extends Model
     }
 
     /**
-     * A PNG of the QR code, sized for print.
+     * A PNG of the QR code on the telegram's paper, sized for print.
      */
     public function loginQrPng(int $size = 1024): string
     {
-        return (new Writer(new GDLibRenderer($size, 2)))->writeString($this->loginUrl());
+        return (new Writer(new GDLibRenderer($size, 2, fill: self::telegramQrFill())))->writeString($this->loginUrl());
+    }
+
+    /**
+     * Dark ink on the yellowed paper of a PRL telegram, the same colours as the printed telegram.
+     */
+    private static function telegramQrFill(): Fill
+    {
+        return Fill::uniformColor(new Rgb(239, 228, 194), new Rgb(35, 38, 46));
     }
 
     public function introHtml(): string

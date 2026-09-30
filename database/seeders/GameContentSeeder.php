@@ -34,53 +34,62 @@ class GameContentSeeder extends Seeder
     ];
 
     /**
-     * Pictures 1 to 9, in order: the file in public/puzzles, the text before it and the one after.
+     * Pictures 1 to 9, in order: the file in public/puzzles, the headline and text before it and the one after.
      *
-     * @var list<array{image: string, lead: string, message: string}>
+     * @var list<array{image: string, title: string, lead: string, message: string}>
      */
     public const array PUZZLES = [
         [
             'image' => '01M3SRXQX5XWDYN84BWKCQDFM3.webp',
+            'title' => 'Graj o bidon',
             'lead' => 'Zbierasz części do czegoś wyjątkowego, a każdy ułożony obrazek to jedna z nich. Na dobry początek coś, bez czego nie ruszysz w żadną trasę…',
             'message' => 'Masz już bidon! 💧 Wszystko zaczyna się od dobrego balansu… i porządnego nawodnienia. Grasz dalej?',
         ],
         [
             'image' => '01M3SRY88W8KZ7J8FFBND1VAHA.webp',
+            'title' => 'Zobacz ile masz na liczniku',
             'lead' => 'Teraz coś, dzięki czemu utrzymasz kurs. Z ekranem, bo przecież lubisz mieć wszystko pod kontrolą.',
             'message' => 'Masz już kierownicę z licznikiem! W Fortisie trzymasz stery, a tutaj mocno chwycisz za kierownicę. Grasz dalej?',
         ],
         [
             'image' => '01M3SRYGX2X42VRB7T5RWH4F34.webp',
+            'title' => 'Zadbaj o sakwy',
             'lead' => 'Gdzie schowasz klucze, telefon i kanapkę na drogę? Ułóż i sprawdź.',
             'message' => 'Masz już torbę na ramę! Zmieści się wszystko… nawet raport kwartalny, jeśli naprawdę musisz. 😉 Grasz dalej?',
         ],
         [
             'image' => '01M3SRZ13XMA8PPVAKV3MT1T17.webp',
+            'title' => 'Zadbaj o oświecenie',
             'lead' => 'Bez tego daleko nie zajedziesz. A na pewno nie z przodu.',
             'message' => 'Masz już przednie koło! Najlepiej smakuje wolność, gdy wiatr wieje prosto w twarz. Grasz dalej?',
         ],
         [
             'image' => '01M3SSYNAJTK8ATCBEBBM627RD.webp',
+            'title' => 'Zyskaj dopalacz',
             'lead' => 'Para do poprzedniego etapu, tym razem z tyłu. I z czymś, co pomoże bezpiecznie wyhamować.',
             'message' => 'Masz już tylne koło z hamulcem tarczowym! Zatrzymasz się tylko wtedy, kiedy sam zechcesz. Grasz dalej?',
         ],
         [
             'image' => '01M3SRZEWZC0HEHK3QMXWJX5FV.webp',
+            'title' => 'Odkryj swój napęd',
             'lead' => 'Serce całej maszyny. Tu zaczyna się prawdziwa moc.',
             'message' => 'Masz już napęd z pedałami! ⚡ Paliwo drożeje, ale ten napęd karmi się prądem i Twoją energią. Grasz dalej?',
         ],
         [
             'image' => '01M3SRZQDHX3V2ETSZEW3CC9M1.webp',
+            'title' => 'Zawalcz o tron',
             'lead' => 'Coś dla wygody na długich trasach. Nawet Szef czasem musi usiąść.',
             'message' => 'Masz już siodełko! Najlepsze widoki są wtedy, gdy jedziesz własnym torem. Grasz dalej?',
         ],
         [
             'image' => '01M3SRZZQ5603X5CJXX1PA5G30.webp',
+            'title' => 'Odkryj symbol swojej ulubionej marki',
             'lead' => 'Wszystko musi się na czymś trzymać. Zgadnij, czyje logo tu znajdziesz?',
             'message' => 'Masz już ramę, oczywiście z logo Fortisu! Wszystkie części zebrane. Zostało tylko złożyć całość…',
         ],
         [
             'image' => '01M3SS0CBPWFQWY5WMTCQB001C.webp',
+            'title' => 'Wygraj rower',
             'lead' => 'Ostatnia prosta! Ułóż całość i zobacz, na co zbierała cała ekipa.',
             'message' => 'Masz cały rower! 🚲 Czas wrzucić wyższy bieg na te 62. urodziny!',
         ],
@@ -130,6 +139,7 @@ class GameContentSeeder extends Seeder
                     'game_id' => $game->id,
                     'position' => $position,
                     'image_path' => $content['image'],
+                    'title' => $content['title'],
                     'lead_message' => $content['lead'],
                     'message' => $content['message'],
                 ]);
@@ -157,11 +167,15 @@ class GameContentSeeder extends Seeder
     }
 
     /**
-     * @param  array{image: string, lead: string, message: string}  $content
+     * @param  array{image: string, title: string, lead: string, message: string}  $content
      */
     private function fillPuzzle(Puzzle $puzzle, array $content): void
     {
         $changes = [];
+
+        if (blank($puzzle->title)) {
+            $changes['title'] = $content['title'];
+        }
 
         if (blank($puzzle->lead_message)) {
             $changes['lead_message'] = $content['lead'];

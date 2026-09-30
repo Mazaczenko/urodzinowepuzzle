@@ -23,6 +23,7 @@ class PuzzleFactory extends Factory
         return [
             'game_id' => Game::factory(),
             'image_path' => fake()->uuid().'.webp',
+            'title' => fake()->words(3, true),
             'lead_message' => fake()->sentence(),
             'message' => fake()->sentences(2, true),
         ];

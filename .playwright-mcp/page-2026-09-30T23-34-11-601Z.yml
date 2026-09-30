@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - generic [aria-hidden]:
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+    - generic: ▲
+  - button "Zmień styl" [ref=e6] [cursor=pointer]
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic [aria-hidden] [ref=e16]: 🧩
+        - heading "Urodzinowe puzzle" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Zaloguj się, żeby odebrać niespodziankę.
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]: E-mail
+          - textbox "E-mail" [active] [ref=e22]
+        - generic [ref=e23]:
+          - generic [ref=e24]: Hasło
+          - textbox "Hasło" [ref=e25]
+        - generic [ref=e26]:
+          - checkbox "Zapamiętaj mnie" [checked] [ref=e27]
+          - text: Zapamiętaj mnie
+        - button "Wchodzę" [ref=e28] [cursor=pointer]

@@ -66,6 +66,7 @@ class GameController extends Controller
                 'id' => $puzzle->id,
                 'number' => $solvedCount + 1,
                 'imageUrl' => $puzzle->imageUrl(),
+                'title' => $puzzle->title,
                 'leadMessage' => $puzzle->lead_message,
                 'message' => $puzzle->message,
                 'grid' => $game->difficulty->grid($solvedCount + 1),

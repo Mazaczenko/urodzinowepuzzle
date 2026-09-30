@@ -39,6 +39,7 @@ class GamePreviewController extends Controller
                 'id' => $puzzle->id,
                 'number' => $position,
                 'imageUrl' => $puzzle->imageUrl(),
+                'title' => $puzzle->title,
                 'leadMessage' => $puzzle->lead_message,
                 'message' => $puzzle->message,
                 'grid' => $game->difficulty->grid($position),

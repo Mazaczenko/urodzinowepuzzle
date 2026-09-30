@@ -31,9 +31,11 @@ class EditGame extends EditRecord
                     ->modalHeading('Kod QR do logowania gracza')
                     ->modalContent(fn (Game $record): View => view('filament.game-qr-code', [
                         'svg' => $record->loginQrSvg(),
+                        'inkSvg' => $record->loginQrInkSvg(),
                         'png' => $record->loginQrPng(),
                         'url' => $record->loginUrl(),
                         'player' => $record->user?->name ?? 'gracz',
+                        'telegramUrl' => route('preview.telegram', $record),
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Zamknij'),

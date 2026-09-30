@@ -67,6 +67,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Player Link Address
+    |--------------------------------------------------------------------------
+    |
+    | The address printed in the player's QR code, whatever host the admin
+    | panel is opened on.
+    |
+    */
+
+    'player_url' => env('PLAYER_URL', 'https://urodzinowepuzzle.pl'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

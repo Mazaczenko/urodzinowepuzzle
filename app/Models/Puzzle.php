@@ -15,7 +15,7 @@ use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
-#[Fillable(['game_id', 'position', 'image_path', 'lead_message', 'message', 'solve_seconds', 'solved_at'])]
+#[Fillable(['game_id', 'position', 'image_path', 'title', 'lead_message', 'message', 'solve_seconds', 'solved_at'])]
 class Puzzle extends Model
 {
     /** @use HasFactory<PuzzleFactory> */
