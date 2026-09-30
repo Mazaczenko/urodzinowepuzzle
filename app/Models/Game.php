@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\GameTheme;
 use Database\Factories\GameFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable(['user_id', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
+#[Fillable(['user_id', 'theme', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
 class Game extends Model
 {
     /** @use HasFactory<GameFactory> */
@@ -22,6 +23,13 @@ class Game extends Model
     public const int PUZZLES_COUNT = 9;
 
     /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'theme' => 'classic',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -29,6 +37,7 @@ class Game extends Model
     protected function casts(): array
     {
         return [
+            'theme' => GameTheme::class,
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];

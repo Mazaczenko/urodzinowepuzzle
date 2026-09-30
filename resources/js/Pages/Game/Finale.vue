@@ -5,6 +5,7 @@ import GameLayout from '@/Layouts/GameLayout.vue';
 import { Fireworks } from '@fireworks-js/vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { usePreferredReducedMotion } from '@vueuse/core';
+import { themeColor } from '@/theme';
 import confetti from 'canvas-confetti';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -52,7 +53,7 @@ function burst() {
     const options = {
         particleCount: 90,
         spread: 75,
-        colors: ['#fbd77a', '#f6c453', '#f9a8d4', '#a5b4fc', '#ffffff'],
+        colors: [themeColor('gold-300'), themeColor('gold-400'), themeColor('glow-a'), themeColor('glow-b'), '#ffffff'],
         disableForReducedMotion: true,
     };
 

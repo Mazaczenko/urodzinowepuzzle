@@ -1,4 +1,11 @@
 <script setup>
+defineProps({
+    sparkle: {
+        type: String,
+        default: '✦',
+    },
+});
+
 const random = (min, max) => min + Math.random() * (max - min);
 
 const stars = Array.from({ length: 46 }, (_, id) => ({
@@ -27,8 +34,8 @@ const sparkles = Array.from({ length: 12 }, (_, id) => ({
 
 <template>
     <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-pink-500/20 blur-3xl" />
-        <div class="absolute -bottom-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-indigo-500/25 blur-3xl" />
+        <div class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-glow-a/20 blur-3xl" />
+        <div class="absolute -bottom-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-glow-b/20 blur-3xl" />
 
         <span
             v-for="star in stars"
@@ -38,13 +45,13 @@ const sparkles = Array.from({ length: 12 }, (_, id) => ({
         />
 
         <span
-            v-for="sparkle in sparkles"
-            :key="`sparkle-${sparkle.id}`"
+            v-for="item in sparkles"
+            :key="`sparkle-${item.id}`"
             class="absolute top-full animate-drift"
-            :class="sparkle.gold ? 'text-gold-300/50' : 'text-pink-300/40'"
-            :style="sparkle.style"
+            :class="item.gold ? 'text-gold-300/50' : 'text-glow-a/50'"
+            :style="item.style"
         >
-            ✦
+            {{ sparkle }}
         </span>
     </div>
 </template>

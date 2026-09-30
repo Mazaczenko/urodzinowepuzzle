@@ -1,5 +1,6 @@
 <script setup>
 import { useGameAudio } from '@/Composables/useGameAudio';
+import { themeColor } from '@/theme';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
 import { nextTick, ref, watch } from 'vue';
@@ -41,7 +42,7 @@ function celebrate(index) {
         spread: 70,
         startVelocity: 26,
         scalar: 0.8,
-        colors: ['#fbd77a', '#f6c453', '#f9a8d4', '#ffffff'],
+        colors: [themeColor('gold-300'), themeColor('gold-400'), themeColor('glow-a'), '#ffffff'],
         origin: {
             x: (left + width / 2) / window.innerWidth,
             y: (top + height / 2) / window.innerHeight,

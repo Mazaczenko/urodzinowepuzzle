@@ -2,6 +2,7 @@
 import { useDebounceFn, useResizeObserver } from '@vueuse/core';
 import gsap from 'gsap';
 import headbreaker from 'headbreaker';
+import { themeColor } from '@/theme';
 import Konva from 'konva';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -298,8 +299,8 @@ function onSolved() {
     const coverLayer = new Konva.Layer({ listening: false });
     const glow = new Konva.Rect({
         ...frame,
-        fill: '#f6c453',
-        shadowColor: '#f6c453',
+        fill: themeColor('gold-400'),
+        shadowColor: themeColor('gold-400'),
         shadowBlur: 36,
         shadowOpacity: 0.9,
         opacity: 0,

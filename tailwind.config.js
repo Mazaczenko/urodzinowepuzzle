@@ -1,6 +1,9 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 
+// Theme colours are CSS variables (see resources/css/app.css), so one class works in every theme.
+const token = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -13,22 +16,29 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Fredoka', ...defaultTheme.fontFamily.sans],
-                display: ['"Playfair Display"', ...defaultTheme.fontFamily.serif],
+                sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+                display: ['var(--font-display)', ...defaultTheme.fontFamily.serif],
             },
             colors: {
+                // The background shades of the theme.
                 night: {
-                    700: '#3b1d6e',
-                    800: '#2a1455',
-                    900: '#1a0f3c',
-                    950: '#0d0822',
+                    700: token('night-700'),
+                    800: token('night-800'),
+                    900: token('night-900'),
+                    950: token('night-950'),
                 },
+                // The accent of the theme: headings, buttons, progress.
                 gold: {
-                    200: '#fde9b0',
-                    300: '#fbd77a',
-                    400: '#f6c453',
-                    500: '#e9a825',
-                    600: '#c9870f',
+                    200: token('gold-200'),
+                    300: token('gold-300'),
+                    400: token('gold-400'),
+                    500: token('gold-500'),
+                    600: token('gold-600'),
+                },
+                // The two soft glows in the background.
+                glow: {
+                    a: token('glow-a'),
+                    b: token('glow-b'),
                 },
             },
             keyframes: {

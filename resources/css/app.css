@@ -2,7 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Themes. Colours are RGB channels so Tailwind can add opacity (bg-gold-300/50).
+ * The default applies everywhere; GameLayout sets data-theme on <html> from the game's setting.
+ */
 @layer base {
+    :root,
+    [data-theme='classic'] {
+        --color-night-700: 59 29 110;
+        --color-night-800: 42 20 85;
+        --color-night-900: 26 15 60;
+        --color-night-950: 13 8 34;
+        --color-gold-200: 253 233 176;
+        --color-gold-300: 251 215 122;
+        --color-gold-400: 246 196 83;
+        --color-gold-500: 233 168 37;
+        --color-gold-600: 201 135 15;
+        --color-glow-a: 236 72 153;
+        --color-glow-b: 99 102 241;
+        --font-sans: 'Fredoka';
+        --font-display: 'Playfair Display';
+    }
+
+    /* A chequered racing flag: asphalt black, white and racing red. */
+    [data-theme='checkers'] {
+        --color-night-700: 58 58 58;
+        --color-night-800: 38 38 38;
+        --color-night-900: 23 23 23;
+        --color-night-950: 10 10 10;
+        --color-gold-200: 255 201 201;
+        --color-gold-300: 255 107 107;
+        --color-gold-400: 240 62 62;
+        --color-gold-500: 225 6 0;
+        --color-gold-600: 179 5 0;
+        --color-glow-a: 225 6 0;
+        --color-glow-b: 255 255 255;
+        --font-sans: 'Fredoka';
+        --font-display: 'Russo One';
+    }
+
+    /* The fortis.pl palette: dark blue, lime, blue and green. */
+    [data-theme='fortis'] {
+        --color-night-700: 22 57 92;
+        --color-night-800: 17 43 69;
+        --color-night-900: 13 33 52;
+        --color-night-950: 8 19 31;
+        --color-gold-200: 229 246 159;
+        --color-gold-300: 207 240 64;
+        --color-gold-400: 185 225 12;
+        --color-gold-500: 156 194 10;
+        --color-gold-600: 122 154 6;
+        --color-glow-a: 1 106 181;
+        --color-glow-b: 89 168 47;
+        --font-sans: 'Ubuntu';
+        --font-display: 'Ubuntu';
+    }
+
     html,
     body {
         @apply bg-night-950;
@@ -17,6 +72,14 @@
     .btn-gold {
         @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-gold-300 to-gold-500 px-7 py-3 text-lg font-semibold text-night-950 shadow-lg shadow-gold-500/30 transition duration-200 hover:scale-105 hover:from-gold-200 hover:to-gold-400 focus:outline-none focus-visible:ring-4 focus-visible:ring-gold-300/50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100;
     }
+}
+
+/* A faint chequerboard behind the checkers theme, fading out towards the middle. */
+[data-theme='checkers'] .theme-pattern {
+    background-image: conic-gradient(#fff 25%, transparent 0 50%, #fff 0 75%, transparent 0);
+    background-size: 64px 64px;
+    opacity: 0.07;
+    mask-image: radial-gradient(ellipse at center, transparent 20%, #000 85%);
 }
 
 @media (prefers-reduced-motion: reduce) {

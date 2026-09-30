@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\GameTheme;
 use App\Filament\Resources\GameResource;
 use App\Filament\Resources\GameResource\Pages\CreateGame;
 use App\Filament\Resources\GameResource\Pages\EditGame;
@@ -267,4 +268,19 @@ test('the content seeder keeps texts changed in the panel and handles missing pi
             'Zmienione w panelu',
             GameContentSeeder::PUZZLE_MESSAGES[2],
         ]);
+});
+
+test('an admin can switch the look of the game', function () {
+    $game = Game::factory()->create();
+
+    expect($game->fresh()->theme)->toBe(GameTheme::Classic);
+
+    $this->actingAs($this->admin);
+
+    Livewire::test(EditGame::class, ['record' => $game->getRouteKey()])
+        ->fillForm(['theme' => GameTheme::Checkers->value])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($game->fresh()->theme)->toBe(GameTheme::Checkers);
 });

@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
 .typed-text :deep(h3) {
     margin-bottom: 0.4em;
     font-weight: 700;
-    color: #fbd77a;
+    color: rgb(var(--color-gold-300));
 }
 
 .typed-text :deep(ul) {

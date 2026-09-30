@@ -2,6 +2,7 @@
 import JigsawBoard from '@/Components/Game/JigsawBoard.vue';
 import MuteButton from '@/Components/Game/MuteButton.vue';
 import PuzzleProgress from '@/Components/Game/PuzzleProgress.vue';
+import ThemeSwitcher from '@/Components/Game/ThemeSwitcher.vue';
 import { useGameAudio } from '@/Composables/useGameAudio';
 import GameLayout from '@/Layouts/GameLayout.vue';
 import { Head, router } from '@inertiajs/vue3';
@@ -160,7 +161,9 @@ onBeforeUnmount(() => stopSound());
                     :total="totalPuzzles"
                 />
 
-                <div class="order-2 justify-self-end sm:order-3">
+                <!-- Above the board, so the style menu opens over it. -->
+                <div class="relative z-20 order-2 flex gap-2 justify-self-end sm:order-3">
+                    <ThemeSwitcher :preview="preview" />
                     <MuteButton />
                 </div>
             </header>

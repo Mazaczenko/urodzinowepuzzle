@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\GameTheme;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Mail\GameCompleted;
 use App\Models\Game;
@@ -264,4 +265,20 @@ test('the board gets the shared sound played after each picture', function () {
 
     $this->actingAs(User::factory()->admin()->create())->get(route('preview.play', [$game, 2]))
         ->assertInertia(fn (Assert $page) => $page->where('completionSoundUrl', asset('music/brawo.mp3')));
+});
+
+test('every screen, the login included, uses the look chosen for the game', function () {
+    $game = Game::factory()->ready()->create(['theme' => GameTheme::Fortis]);
+
+    $this->get('/login')->assertInertia(fn (Assert $page) => $page->where('theme', 'fortis'));
+    $this->actingAs($game->user)->get('/')->assertInertia(fn (Assert $page) => $page->where('theme', 'fortis'));
+    $this->actingAs($game->user)->get('/play')->assertInertia(fn (Assert $page) => $page->where('theme', 'fortis'));
+});
+
+test('the preview shows the look of the previewed game', function () {
+    Game::factory()->ready()->create(['theme' => GameTheme::Fortis]);
+    $game = Game::factory()->ready()->create(['theme' => GameTheme::Checkers]);
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('preview.intro', $game))
+        ->assertInertia(fn (Assert $page) => $page->where('theme', 'checkers'));
 });
