@@ -231,37 +231,45 @@ test('a picture can be saved without a message', function () {
         ->and($game->fresh()->isReady())->toBeFalse();
 });
 
-test('the content seeder fills in the intro and the message of each picture by position', function () {
-    $game = Game::factory()
-        ->has(Puzzle::factory()->count(9)->state(['message' => null]))
-        ->create(['intro_text' => null, 'finale_text' => '<p>Finał</p>']);
+test('the content seeder builds the whole game from the pictures in public/puzzles', function () {
+    Storage::fake('puzzles');
+    collect(GameContentSeeder::PUZZLES)->each(fn (array $content) => Storage::disk('puzzles')->put($content['image'], 'image'));
 
+    $game = Game::factory()->create(['intro_text' => null, 'finale_text' => '<p>Finał</p>']);
+
+    $this->seed(GameContentSeeder::class);
     $this->seed(GameContentSeeder::class);
 
     $game->refresh();
 
     expect($game->intro_text)->toBe(GameContentSeeder::INTRO_TEXT)
         ->and($game->finale_text)->toBe('<p>Finał</p>')
-        ->and($game->puzzles()->pluck('message')->all())->toBe(GameContentSeeder::PUZZLE_MESSAGES)
+        ->and($game->puzzles()->pluck('image_path')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'image'))
+        ->and($game->puzzles()->pluck('message')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'message'))
+        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 9))
         ->and($game->isReady())->toBeTrue();
 });
 
-test('the content seeder keeps texts changed in the panel and handles missing pictures', function () {
+test('the content seeder keeps pictures and texts added in the panel', function () {
+    Storage::fake('puzzles');
+
     $game = Game::factory()
         ->has(Puzzle::factory()->count(3)->state(['message' => null]))
         ->create(['intro_text' => '<p>Własny wstęp</p>']);
     $game->puzzles[1]->update(['message' => 'Zmienione w panelu']);
+    $ownPictures = $game->puzzles->pluck('image_path')->all();
 
+    // No picture files on this disk, so the missing pictures 4 to 9 are skipped.
     $this->seed(GameContentSeeder::class);
 
     expect($game->fresh()->intro_text)->toBe('<p>Własny wstęp</p>')
+        ->and($game->puzzles()->pluck('image_path')->all())->toBe($ownPictures)
         ->and($game->puzzles()->pluck('message')->all())->toBe([
-            GameContentSeeder::PUZZLE_MESSAGES[0],
+            GameContentSeeder::PUZZLES[0]['message'],
             'Zmienione w panelu',
-            GameContentSeeder::PUZZLE_MESSAGES[2],
+            GameContentSeeder::PUZZLES[2]['message'],
         ]);
 });
-
 test('an admin can switch the look of the game', function () {
     $game = Game::factory()->create();
 
