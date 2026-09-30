@@ -16,6 +16,7 @@ Route::middleware(['auth', RedirectAdminToPanel::class])->group(function () {
 });
 
 Route::middleware(['auth', EnsureUserIsAdmin::class])->prefix('preview/{game}')->name('preview.')->group(function () {
+    Route::get('/', [GamePreviewController::class, 'intro'])->name('intro');
     Route::get('/play/{position?}', [GamePreviewController::class, 'play'])->whereNumber('position')->name('play');
     Route::get('/finale', [GamePreviewController::class, 'finale'])->name('finale');
 });

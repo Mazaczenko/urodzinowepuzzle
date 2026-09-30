@@ -3,12 +3,16 @@ import { Howl, Howler } from 'howler';
 import { watch } from 'vue';
 
 const MUSIC_VOLUME = 0.45;
+// How loud the music stays while a one-off sound plays over it.
+const DUCKED_VOLUME = 0.1;
+const SOUND_VOLUME = 0.9;
 
 // Module-level state: the music keeps playing while Inertia swaps pages.
 const muted = useStorage('puzzle-muted', false);
 
 let music = null;
 let musicSrc = null;
+let sound = null;
 let pausedByVisibility = false;
 let listening = false;
 
@@ -55,7 +59,8 @@ function playMusic(src, { fade = 2000 } = {}) {
     }
 
     if (music && musicSrc === src) {
-        if (!music.playing()) {
+        // While the file loads the queued play does not count as playing yet; queueing another would double the track.
+        if (music.state() === 'loaded' && !music.playing()) {
             music.play();
         }
         return;
@@ -64,7 +69,7 @@ function playMusic(src, { fade = 2000 } = {}) {
     stopMusic(fade);
 
     const track = new Howl({ src: [src], loop: true, volume: 0 });
-    track.once('play', () => track.fade(0, MUSIC_VOLUME, fade));
+    track.once('play', () => track.fade(0, sound ? DUCKED_VOLUME : MUSIC_VOLUME, fade));
     track.play();
 
     music = track;
@@ -86,6 +91,56 @@ function stopMusic(fade = 1000) {
     } else {
         track.unload();
     }
+}
+
+function duckMusic(ducked, duration) {
+    if (music?.playing()) {
+        music.fade(music.volume(), ducked ? DUCKED_VOLUME : MUSIC_VOLUME, duration);
+    }
+}
+
+/**
+ * Play a track once over the music, which quietens down until the track ends or is stopped.
+ */
+function playSound(src) {
+    listenForVisibility();
+    applyMute();
+    stopSound(0);
+
+    const track = new Howl({ src: [src], volume: SOUND_VOLUME });
+    const finish = () => {
+        if (sound === track) {
+            sound = null;
+            track.unload();
+            duckMusic(false, 1200);
+        }
+    };
+
+    track.once('end', finish);
+    track.once('loaderror', finish);
+    track.once('playerror', finish);
+    track.play();
+
+    sound = track;
+    duckMusic(true, 400);
+}
+
+function stopSound(fade = 800) {
+    if (!sound) {
+        return;
+    }
+
+    const track = sound;
+    sound = null;
+
+    if (fade > 0 && track.playing()) {
+        track.once('fade', () => track.unload());
+        track.fade(track.volume(), 0, fade);
+    } else {
+        track.unload();
+    }
+
+    duckMusic(false, fade || 400);
 }
 
 /**
@@ -151,6 +206,8 @@ export function useGameAudio() {
         },
         playMusic,
         stopMusic,
+        playSound,
+        stopSound,
         sfx,
     };
 }

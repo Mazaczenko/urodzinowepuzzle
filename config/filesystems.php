@@ -47,6 +47,26 @@ return [
             'report' => false,
         ],
 
+        // Puzzle pictures live straight in the web root, so they are served without the storage symlink.
+        'puzzles' => [
+            'driver' => 'local',
+            'root' => public_path('puzzles'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/puzzles',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Music is served from the web root as well, for the same reason.
+        'music' => [
+            'driver' => 'local',
+            'root' => public_path('music'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/music',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

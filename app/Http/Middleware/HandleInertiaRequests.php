@@ -32,7 +32,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                // Never the whole model: its loaded relations would carry the game, and with it the BLIK code.
+                // Never the whole model: its loaded relations would carry the game, and with it every picture's message.
                 'user' => $request->user()?->only('id', 'name', 'email', 'email_verified_at'),
             ],
         ];

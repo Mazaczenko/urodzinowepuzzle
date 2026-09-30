@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GameCompleted;
 use App\Models\Puzzle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
+
+use function Illuminate\Support\defer;
 
 class PuzzleController extends Controller
 {
     /**
-     * Mark the player's current puzzle as solved, which reveals the next digit.
+     * Mark the player's current puzzle as solved and move on to the next one.
      */
     public function solve(Request $request, Puzzle $puzzle): RedirectResponse
     {
@@ -29,6 +34,15 @@ class PuzzleController extends Controller
 
         if ($game->currentPuzzle() === null) {
             $game->update(['completed_at' => now()]);
+
+            // Sent after the response, so a slow or failing mail server never holds up the finale.
+            defer(function () use ($game): void {
+                try {
+                    Mail::to(config('app.game_completed_recipient'))->send(new GameCompleted($game));
+                } catch (Throwable $exception) {
+                    report($exception);
+                }
+            });
 
             return to_route('game.finale');
         }

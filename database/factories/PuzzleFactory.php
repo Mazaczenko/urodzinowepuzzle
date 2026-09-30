@@ -22,8 +22,8 @@ class PuzzleFactory extends Factory
     {
         return [
             'game_id' => Game::factory(),
-            'image_path' => 'puzzles/'.fake()->uuid().'.webp',
-            'caption' => fake()->sentence(3),
+            'image_path' => fake()->uuid().'.webp',
+            'message' => fake()->sentences(2, true),
         ];
     }
 

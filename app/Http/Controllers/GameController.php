@@ -26,17 +26,20 @@ class GameController extends Controller
         }
 
         return Inertia::render('Game/Intro', [
+            'introText' => $game->introHtml(),
             'solvedCount' => $game->solvedPuzzlesCount(),
             'totalPuzzles' => Game::PUZZLES_COUNT,
             'musicUrl' => $game->musicUrl(),
+            'startUrl' => route('game.play'),
+            'preview' => false,
         ]);
     }
 
     /**
      * Show the puzzle the player is currently on.
      *
-     * Only the current picture and the digits earned so far are sent to the
-     * browser, so the rest of the code cannot be read from the page source.
+     * Only the current picture and its message are sent to the browser,
+     * so the following ones cannot be read from the page source.
      */
     public function play(Request $request): Response|RedirectResponse
     {
@@ -56,25 +59,26 @@ class GameController extends Controller
             $game->update(['started_at' => now()]);
         }
 
-        $revealedDigits = $game->revealedDigits();
+        $solvedCount = $game->solvedPuzzlesCount();
 
         return Inertia::render('Game/Play', [
             'puzzle' => [
                 'id' => $puzzle->id,
-                'number' => count($revealedDigits) + 1,
+                'number' => $solvedCount + 1,
                 'imageUrl' => $puzzle->imageUrl(),
-                'caption' => $puzzle->caption,
+                'message' => $puzzle->message,
             ],
-            'revealedDigits' => $revealedDigits,
+            'solvedCount' => $solvedCount,
             'totalPuzzles' => Game::PUZZLES_COUNT,
             'musicUrl' => $game->musicUrl(),
+            'completionSoundUrl' => $game->completionSoundUrl(),
             'advanceUrl' => route('puzzles.solve', $puzzle),
             'preview' => false,
         ]);
     }
 
     /**
-     * The only place the full BLIK code leaves the server, and only after the last puzzle.
+     * Fireworks and the closing text, once the last picture is put together.
      */
     public function finale(Request $request): Response|RedirectResponse
     {
@@ -85,9 +89,7 @@ class GameController extends Controller
         }
 
         return Inertia::render('Game/Finale', [
-            'code' => $game->blik_code,
-            'password' => $game->blik_password,
-            'wishes' => (string) str($game->wishes ?? '')->sanitizeHtml(),
+            'finaleText' => $game->finaleHtml(),
             'musicUrl' => $game->finaleMusicUrl() ?? $game->musicUrl(),
             'preview' => false,
         ]);

@@ -177,8 +177,17 @@ function build() {
     canvas.puzzle.attachVerticalConnectionRequirement(isNeighbour(0, piece));
     canvas.puzzle.forceConnectionWhileDragging();
 
-    const spots = scatterSpots(layout, canvas.puzzle.pieces.length);
-    canvas.puzzle.shuffleWith(() => spots);
+    // Shuffling connects neighbours that happen to land side by side, so deal again until none are.
+    for (let attempt = 0; attempt < 30; attempt++) {
+        const spots = scatterSpots(layout, canvas.puzzle.pieces.length);
+        canvas.puzzle.shuffleWith(() => spots);
+
+        if (!canvas.puzzle.pieces.some((puzzlePiece) => puzzlePiece.connected)) {
+            break;
+        }
+    }
+
+    canvas.puzzle.disconnect();
     canvas.autoconnected = true;
 
     canvas.attachSolvedValidator();

@@ -29,8 +29,7 @@ class GameResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Gracz i czek BLIK')
-                    ->columns(2)
+                Forms\Components\Section::make('Gracz')
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('Gracz')
@@ -38,41 +37,30 @@ class GameResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->rule(Rule::exists('users', 'id')->where(fn (QueryBuilder $query) => $query->where('is_admin', false)))
                             ->validationMessages(['unique' => 'Ten gracz ma już swoją grę.'])
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\TextInput::make('blik_code')
-                            ->label('Kod czeku BLIK')
-                            ->helperText('Dokładnie '.Game::PUZZLES_COUNT.' cyfr. Sprawdź w aplikacji banku, czy czek będzie ważny w dniu urodzin.')
-                            ->password()
-                            ->revealable()
-                            ->autocomplete(false)
-                            ->inputMode('numeric')
-                            ->length(Game::PUZZLES_COUNT)
-                            ->rule('digits:'.Game::PUZZLES_COUNT),
-                        Forms\Components\TextInput::make('blik_password')
-                            ->label('Hasło czeku')
-                            ->helperText('Opcjonalne, jeśli bank wymaga hasła przy wypłacie.')
-                            ->password()
-                            ->revealable()
-                            ->autocomplete(false)
-                            ->maxLength(50),
+                            ->required(),
                     ]),
-                Forms\Components\Section::make('Życzenia')
-                    ->description('Pojawią się w finale, pisane litera po literze.')
+                Forms\Components\Section::make('Teksty')
+                    ->description('Oba pojawiają się pisane litera po literze.')
                     ->schema([
-                        Forms\Components\RichEditor::make('wishes')
-                            ->hiddenLabel()
-                            ->toolbarButtons(['bold', 'italic', 'underline', 'strike', 'h2', 'h3', 'bulletList', 'orderedList', 'redo', 'undo']),
+                        static::textEditor('intro_text')
+                            ->label('Tekst na początek')
+                            ->helperText('Ekran startowy, zanim gracz zacznie układać, np. życzenia i zaproszenie do gry.'),
+                        static::textEditor('finale_text')
+                            ->label('Tekst na zakończenie')
+                            ->helperText('Finał z fajerwerkami, po ułożeniu wszystkich obrazków.'),
                     ]),
                 Forms\Components\Section::make('Muzyka')
-                    ->columns(2)
+                    ->columns(3)
                     ->schema([
                         static::musicUpload('music_path')
                             ->label('Muzyka w trakcie gry')
-                            ->helperText('MP3, gra w pętli podczas układania.'),
+                            ->helperText('MP3 do 30 MB, gra w pętli przez wszystkie obrazki.'),
                         static::musicUpload('finale_music_path')
                             ->label('Muzyka na finał')
-                            ->helperText('MP3, włącza się razem z fajerwerkami.'),
+                            ->helperText('MP3 do 30 MB, płynnie zastępuje muzykę z gry po ułożeniu ostatniego obrazka, razem z fajerwerkami.'),
+                        static::musicUpload('completion_sound_path')
+                            ->label('Dźwięk po ułożeniu obrazka')
+                            ->helperText('MP3 do 30 MB, gra po ułożeniu każdego obrazka oprócz ostatniego (po nim wchodzi muzyka na finał). Muzyka w tle na ten czas cichnie.'),
                     ]),
             ]);
     }
@@ -107,7 +95,7 @@ class GameResource extends Resource
                     ->label('Podgląd jako gracz')
                     ->icon('heroicon-o-eye')
                     ->color('gray')
-                    ->url(fn (Game $record): string => route('preview.play', $record))
+                    ->url(fn (Game $record): string => route('preview.intro', $record))
                     ->openUrlInNewTab()
                     ->visible(fn (Game $record): bool => $record->puzzles()->exists()),
                 Tables\Actions\Action::make('resetProgress')
@@ -115,7 +103,7 @@ class GameResource extends Resource
                     ->icon('heroicon-o-arrow-path')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalDescription('Gracz zacznie od pierwszego obrazka. Obrazki, kod i życzenia zostają bez zmian.')
+                    ->modalDescription('Gracz zacznie od pierwszego obrazka. Obrazki, teksty i muzyka zostają bez zmian.')
                     ->action(fn (Game $record) => $record->resetProgress()),
                 Tables\Actions\EditAction::make(),
             ]);
@@ -127,15 +115,16 @@ class GameResource extends Resource
     public static function missingParts(Game $game): ?string
     {
         $missing = [];
-
-        if (! $game->hasCompleteCode()) {
-            $missing[] = 'kod BLIK ('.Game::PUZZLES_COUNT.' cyfr)';
-        }
-
         $puzzlesCount = $game->puzzles()->count();
 
         if ($puzzlesCount !== Game::PUZZLES_COUNT) {
             $missing[] = 'obrazki ('.$puzzlesCount.' z '.Game::PUZZLES_COUNT.')';
+        }
+
+        $withoutMessage = $game->puzzlesWithoutMessageCount();
+
+        if ($withoutMessage > 0) {
+            $missing[] = 'teksty przy obrazkach ('.$withoutMessage.' bez tekstu)';
         }
 
         return $missing === [] ? null : 'Brakuje: '.implode(', ', $missing);
@@ -164,12 +153,17 @@ class GameResource extends Resource
         ];
     }
 
+    protected static function textEditor(string $name): Forms\Components\RichEditor
+    {
+        return Forms\Components\RichEditor::make($name)
+            ->toolbarButtons(['bold', 'italic', 'underline', 'strike', 'h2', 'h3', 'bulletList', 'orderedList', 'redo', 'undo']);
+    }
+
     protected static function musicUpload(string $name): Forms\Components\FileUpload
     {
         return Forms\Components\FileUpload::make($name)
-            ->disk('public')
-            ->directory('music')
+            ->disk('music')
             ->acceptedFileTypes(['audio/mpeg'])
-            ->maxSize(12288);
+            ->maxSize(30720);
     }
 }

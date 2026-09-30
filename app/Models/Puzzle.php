@@ -15,7 +15,7 @@ use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
-#[Fillable(['game_id', 'position', 'image_path', 'caption', 'solve_seconds', 'solved_at'])]
+#[Fillable(['game_id', 'position', 'image_path', 'message', 'solve_seconds', 'solved_at'])]
 class Puzzle extends Model
 {
     /** @use HasFactory<PuzzleFactory> */
@@ -50,12 +50,12 @@ class Puzzle extends Model
 
         static::updated(function (Puzzle $puzzle): void {
             if ($puzzle->wasChanged('image_path')) {
-                Storage::disk('public')->delete($puzzle->getOriginal('image_path'));
+                Storage::disk('puzzles')->delete($puzzle->getOriginal('image_path'));
             }
         });
 
         static::deleted(function (Puzzle $puzzle): void {
-            Storage::disk('public')->delete($puzzle->image_path);
+            Storage::disk('puzzles')->delete($puzzle->image_path);
             $puzzle->game?->resequencePuzzles();
         });
     }
@@ -70,7 +70,7 @@ class Puzzle extends Model
 
     public function imageUrl(): string
     {
-        return asset('storage/'.$this->image_path);
+        return asset('puzzles/'.$this->image_path);
     }
 
     public function isSolved(): bool
@@ -79,7 +79,7 @@ class Puzzle extends Model
     }
 
     /**
-     * Crop an uploaded picture to 5:2, compress it to WebP and store it on the public disk.
+     * Crop an uploaded picture to 5:2, compress it to WebP and store it in public/puzzles.
      */
     public static function storeImage(UploadedFile $file): string
     {
@@ -90,9 +90,9 @@ class Puzzle extends Model
             ->cover(self::IMAGE_WIDTH, self::IMAGE_HEIGHT)
             ->encode(new WebpEncoder(quality: 82));
 
-        $path = 'puzzles/'.Str::ulid().'.webp';
+        $path = Str::ulid().'.webp';
 
-        Storage::disk('public')->put($path, (string) $encoded);
+        Storage::disk('puzzles')->put($path, (string) $encoded);
 
         return $path;
     }

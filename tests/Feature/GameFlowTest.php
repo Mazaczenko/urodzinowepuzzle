@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Mail\GameCompleted;
 use App\Models\Game;
 use App\Models\Puzzle;
 use App\Models\User;
+use Database\Seeders\GameContentSeeder;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are sent to the login screen', function (string $uri) {
@@ -51,7 +54,7 @@ test('the player sees a waiting screen until the game is ready', function (Closu
 })->with([
     'no game' => fn () => fn (User $player) => null,
     'too few pictures' => fn () => fn (User $player) => Game::factory()->for($player)->has(Puzzle::factory()->count(8))->create(),
-    'incomplete code' => fn () => fn (User $player) => Game::factory()->for($player)->ready()->create(['blik_code' => '12345']),
+    'picture without a message' => fn () => fn (User $player) => Game::factory()->for($player)->ready()->create()->puzzles->first()->update(['message' => null]),
 ]);
 
 test('the intro shows how far the player got', function () {
@@ -65,8 +68,8 @@ test('the intro shows how far the player got', function () {
             ->where('totalPuzzles', 9));
 });
 
-test('play sends only the current picture and the digits earned so far', function () {
-    $game = Game::factory()->ready()->create(['blik_code' => '987654321']);
+test('play sends only the current picture and its message', function () {
+    $game = Game::factory()->ready()->create();
     $puzzles = $game->puzzles;
     $puzzles[0]->update(['solved_at' => now()]);
     $puzzles[1]->update(['solved_at' => now()]);
@@ -78,23 +81,14 @@ test('play sends only the current picture and the digits earned so far', functio
         ->where('puzzle.id', $puzzles[2]->id)
         ->where('puzzle.number', 3)
         ->where('puzzle.imageUrl', $puzzles[2]->imageUrl())
-        ->where('revealedDigits', ['9', '8'])
+        ->where('puzzle.message', $puzzles[2]->message)
+        ->where('solvedCount', 2)
         ->where('advanceUrl', route('puzzles.solve', $puzzles[2]))
-        ->where('preview', false)
-        ->missing('code'));
+        ->where('preview', false));
 
-    $response->assertDontSee('987654321');
     $response->assertDontSee($puzzles[3]->image_path);
+    $response->assertDontSee(e($puzzles[3]->message));
 });
-
-test('no game screen leaks the code before the finale', function (string $uri) {
-    $game = Game::factory()->ready()->create(['blik_code' => '987654321', 'blik_password' => 'tajne-haslo']);
-
-    $this->actingAs($game->user)->get($uri)
-        ->assertOk()
-        ->assertDontSee('987654321')
-        ->assertDontSee('tajne-haslo');
-})->with(['/', '/play']);
 
 test('opening the board starts the game clock once', function () {
     $game = Game::factory()->ready()->create();
@@ -110,8 +104,8 @@ test('opening the board starts the game clock once', function () {
         ->and($game->fresh()->started_at->equalTo($startedAt))->toBeTrue();
 });
 
-test('solving the current puzzle reveals the next digit', function () {
-    $game = Game::factory()->ready()->create(['blik_code' => '987654321']);
+test('solving the current puzzle moves on to the next one', function () {
+    $game = Game::factory()->ready()->create();
     $puzzle = $game->puzzles->first();
 
     $this->actingAs($game->user)
@@ -121,7 +115,7 @@ test('solving the current puzzle reveals the next digit', function () {
     expect($puzzle->fresh())
         ->solved_at->not->toBeNull()
         ->solve_seconds->toBe(42)
-        ->and($game->revealedDigits())->toBe(['9'])
+        ->and($game->currentPuzzle()->is($game->puzzles[1]))->toBeTrue()
         ->and($game->fresh()->completed_at)->toBeNull();
 });
 
@@ -182,27 +176,21 @@ test('solving the last puzzle completes the game and opens the finale', function
 });
 
 test('the finale stays locked until the game is completed', function () {
-    $game = Game::factory()->ready()->create(['blik_code' => '987654321']);
+    $game = Game::factory()->ready()->create();
     $game->puzzles->take(8)->each->update(['solved_at' => now()]);
 
-    $this->actingAs($game->user)->get('/finale')
-        ->assertRedirect(route('game.play'))
-        ->assertDontSee('987654321');
+    $this->actingAs($game->user)->get('/finale')->assertRedirect(route('game.play'));
 });
 
-test('the finale hands over the full code, the password and the wishes', function () {
+test('the finale shows the sanitized closing text', function () {
     $game = Game::factory()->completed()->create([
-        'blik_code' => '987654321',
-        'blik_password' => 'tajne',
-        'wishes' => '<p>Sto lat!</p><script>alert(1)</script>',
+        'finale_text' => '<p>Sto lat!</p><script>alert(1)</script>',
     ]);
 
     $this->actingAs($game->user)->get('/finale')
         ->assertInertia(fn (Assert $page) => $page
             ->component('Game/Finale')
-            ->where('code', '987654321')
-            ->where('password', 'tajne')
-            ->where('wishes', '<p>Sto lat!</p>')
+            ->where('finaleText', '<p>Sto lat!</p>')
             ->where('preview', false));
 });
 
@@ -212,12 +200,68 @@ test('a completed game skips straight to the finale', function (string $uri) {
     $this->actingAs($game->user)->get($uri)->assertRedirect(route('game.finale'));
 })->with(['/', '/play']);
 
-test('the blik code is encrypted in the database', function () {
-    $game = Game::factory()->create(['blik_code' => '987654321', 'blik_password' => 'tajne']);
+test('finishing the game e-mails the organiser, and only then', function () {
+    Mail::fake();
+    config(['app.game_completed_recipient' => 'm.piorko@fortis.pl']);
 
-    $stored = $game->getConnection()->table('games')->find($game->id);
+    $game = Game::factory()->ready()->create();
+    $game->puzzles->take(7)->each->update(['solved_at' => now()]);
 
-    expect($stored->blik_code)->not->toContain('987654321')
-        ->and($stored->blik_password)->not->toContain('tajne')
-        ->and($game->fresh()->blik_code)->toBe('987654321');
+    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[7]));
+    Mail::assertNothingSent();
+
+    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[8]));
+
+    Mail::assertSent(GameCompleted::class, fn (GameCompleted $mail) => $mail->hasTo('m.piorko@fortis.pl')
+        && $mail->game->is($game));
+    Mail::assertSentCount(1);
+});
+
+test('the completion e-mail tells the organiser to send the money', function () {
+    $game = Game::factory()->completed()->create();
+
+    (new GameCompleted($game))
+        ->assertHasSubject('Mirek ułożył puzzle 🧩 czas bliknąć kasę!')
+        ->assertSeeInHtml('Trzeba mu bliknąć kasę.');
+});
+
+test('the birthday wishes open the game on the intro screen', function () {
+    $game = Game::factory()->ready()->create(['intro_text' => GameContentSeeder::INTRO_TEXT.'<script>alert(1)</script>']);
+
+    $this->actingAs($game->user)->get('/')
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Game/Intro')
+            ->where('introText', GameContentSeeder::INTRO_TEXT)
+            ->where('startUrl', route('game.play'))
+            ->where('preview', false));
+});
+
+test('one track plays through the pictures and another one on the finale', function () {
+    $game = Game::factory()->ready()->create(['music_path' => 'gra.mp3', 'finale_music_path' => 'final.mp3']);
+
+    $this->actingAs($game->user)->get('/play')
+        ->assertInertia(fn (Assert $page) => $page->where('musicUrl', asset('music/gra.mp3')));
+
+    $game->puzzles->each->update(['solved_at' => now()]);
+    $game->update(['completed_at' => now()]);
+
+    $this->actingAs($game->user->fresh())->get('/finale')
+        ->assertInertia(fn (Assert $page) => $page->where('musicUrl', asset('music/final.mp3')));
+});
+
+test('the finale keeps the game music when it has no track of its own', function () {
+    $game = Game::factory()->completed()->create(['music_path' => 'gra.mp3']);
+
+    $this->actingAs($game->user)->get('/finale')
+        ->assertInertia(fn (Assert $page) => $page->where('musicUrl', asset('music/gra.mp3')));
+});
+
+test('the board gets the shared sound played after each picture', function () {
+    $game = Game::factory()->ready()->create(['completion_sound_path' => 'brawo.mp3']);
+
+    $this->actingAs($game->user)->get('/play')
+        ->assertInertia(fn (Assert $page) => $page->where('completionSoundUrl', asset('music/brawo.mp3')));
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('preview.play', [$game, 2]))
+        ->assertInertia(fn (Assert $page) => $page->where('completionSoundUrl', asset('music/brawo.mp3')));
 });

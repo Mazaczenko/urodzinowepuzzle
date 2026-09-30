@@ -43,6 +43,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Game Completed Notification
+    |--------------------------------------------------------------------------
+    |
+    | Who gets an e-mail once the player puts the last picture together.
+    |
+    */
+
+    'game_completed_recipient' => env('GAME_COMPLETED_RECIPIENT', 'm.piorko@fortis.pl'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |

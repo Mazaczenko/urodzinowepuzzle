@@ -4,22 +4,20 @@ namespace App\Models;
 
 use Database\Factories\GameFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable(['user_id', 'blik_code', 'blik_password', 'wishes', 'music_path', 'finale_music_path', 'started_at', 'completed_at'])]
-#[Hidden(['blik_code', 'blik_password'])]
+#[Fillable(['user_id', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
 class Game extends Model
 {
     /** @use HasFactory<GameFactory> */
     use HasFactory;
 
     /**
-     * One picture per digit of the BLIK cheque code.
+     * How many pictures the player puts together, each followed by its message.
      */
     public const int PUZZLES_COUNT = 9;
 
@@ -31,8 +29,6 @@ class Game extends Model
     protected function casts(): array
     {
         return [
-            'blik_code' => 'encrypted',
-            'blik_password' => 'encrypted',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];
@@ -68,40 +64,16 @@ class Game extends Model
     }
 
     /**
-     * Digits of the BLIK code the player has earned so far.
-     *
-     * @return list<string>
-     */
-    public function revealedDigits(): array
-    {
-        return $this->digits($this->solvedPuzzlesCount());
-    }
-
-    /**
-     * The first digits of the BLIK code.
-     *
-     * @return list<string>
-     */
-    public function digits(int $count): array
-    {
-        if ($count < 1 || blank($this->blik_code)) {
-            return [];
-        }
-
-        return array_slice(str_split((string) $this->blik_code), 0, $count);
-    }
-
-    /**
-     * A game can be played once it has all pictures and a complete code.
+     * A game can be played once it has all pictures and each of them has its message.
      */
     public function isReady(): bool
     {
-        return $this->hasCompleteCode() && $this->puzzles()->count() === self::PUZZLES_COUNT;
+        return $this->puzzles()->count() === self::PUZZLES_COUNT && $this->puzzlesWithoutMessageCount() === 0;
     }
 
-    public function hasCompleteCode(): bool
+    public function puzzlesWithoutMessageCount(): int
     {
-        return preg_match('/^\d{'.self::PUZZLES_COUNT.'}$/', (string) $this->blik_code) === 1;
+        return $this->puzzles()->where(fn ($query) => $query->whereNull('message')->orWhere('message', ''))->count();
     }
 
     /**
@@ -154,13 +126,28 @@ class Game extends Model
     /**
      * Same-origin URL, so the browser can fetch and decode the track whatever host the game is opened on.
      */
+    public function introHtml(): string
+    {
+        return (string) str($this->intro_text ?? '')->sanitizeHtml();
+    }
+
+    public function finaleHtml(): string
+    {
+        return (string) str($this->finale_text ?? '')->sanitizeHtml();
+    }
+
     public function musicUrl(): ?string
     {
-        return $this->music_path ? asset('storage/'.$this->music_path) : null;
+        return $this->music_path ? asset('music/'.$this->music_path) : null;
     }
 
     public function finaleMusicUrl(): ?string
     {
-        return $this->finale_music_path ? asset('storage/'.$this->finale_music_path) : null;
+        return $this->finale_music_path ? asset('music/'.$this->finale_music_path) : null;
+    }
+
+    public function completionSoundUrl(): ?string
+    {
+        return $this->completion_sound_path ? asset('music/'.$this->completion_sound_path) : null;
     }
 }

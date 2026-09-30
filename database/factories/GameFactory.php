@@ -21,9 +21,8 @@ class GameFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'blik_code' => '123456789',
-            'blik_password' => null,
-            'wishes' => '<p>'.fake()->sentence().'</p>',
+            'intro_text' => '<p>'.fake()->sentence().'</p>',
+            'finale_text' => '<p>'.fake()->sentence().'</p>',
         ];
     }
 

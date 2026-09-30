@@ -1,20 +1,20 @@
 <script setup>
-import DigitSlots from '@/Components/Game/DigitSlots.vue';
 import JigsawBoard from '@/Components/Game/JigsawBoard.vue';
 import MuteButton from '@/Components/Game/MuteButton.vue';
+import PuzzleProgress from '@/Components/Game/PuzzleProgress.vue';
 import { useGameAudio } from '@/Composables/useGameAudio';
 import GameLayout from '@/Layouts/GameLayout.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { useWakeLock } from '@vueuse/core';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const props = defineProps({
     puzzle: {
         type: Object,
         required: true,
     },
-    revealedDigits: {
-        type: Array,
+    solvedCount: {
+        type: Number,
         required: true,
     },
     totalPuzzles: {
@@ -22,6 +22,10 @@ const props = defineProps({
         required: true,
     },
     musicUrl: {
+        type: String,
+        default: null,
+    },
+    completionSoundUrl: {
         type: String,
         default: null,
     },
@@ -35,16 +39,16 @@ const props = defineProps({
     },
 });
 
-const { playMusic, sfx } = useGameAudio();
+const { playMusic, playSound, stopSound, sfx } = useGameAudio();
 const wakeLock = useWakeLock();
 
 // The server moves on to the next puzzle as soon as this one is solved, while the screen
-// keeps showing the finished picture until the player presses "Dalej". So the board and
-// the digits on screen are local copies that follow the props only at those moments.
+// keeps showing the finished picture and its message until the player presses "Dalej". So the
+// board and the progress on screen are local copies that follow the props only at those moments.
 const board = ref({ ...props.puzzle, advanceUrl: props.advanceUrl });
-const shownDigits = ref([...props.revealedDigits]);
+const shownSolved = ref(props.solvedCount);
 
-// playing → merging (picture slides together) → merged → revealed (digit is in its slot)
+// playing → merging (picture slides together) → merged (message shows) → saved (progress is stored)
 const phase = ref('playing');
 const submitting = ref(false);
 const failed = ref(false);
@@ -57,21 +61,27 @@ const isLast = computed(() => board.value.number >= props.totalPuzzles);
 function onSolved(seconds) {
     solveSeconds = seconds;
     phase.value = 'merging';
-    sfx.complete();
+
+    // The last picture is followed by the finale music instead.
+    if (props.completionSoundUrl && !isLast.value) {
+        playSound(props.completionSoundUrl);
+    } else {
+        sfx.complete();
+    }
 }
 
 function onMerged() {
     phase.value = 'merged';
 
-    // The last digit is revealed on the finale screen, so that step waits for a click.
+    // The last picture leads straight to the finale, so it waits until the message has been read.
     if (!isLast.value) {
         advance();
     }
 }
 
 /**
- * Tell the server the picture is done. It answers with the next puzzle and one more digit,
- * or with the finale after the last picture. The preview only walks through the pictures.
+ * Tell the server the picture is done. It answers with the next puzzle, or with the finale
+ * after the last picture. The preview only walks through the pictures.
  */
 function advance() {
     if (submitting.value) {
@@ -90,8 +100,8 @@ function advance() {
             advanced = true;
 
             if (page.component === 'Game/Play') {
-                shownDigits.value = [...page.props.revealedDigits];
-                phase.value = 'revealed';
+                shownSolved.value = page.props.solvedCount;
+                phase.value = 'saved';
             }
         },
         onFinish: () => {
@@ -108,6 +118,7 @@ function advance() {
 }
 
 function next() {
+    stopSound();
     board.value = { ...props.puzzle, advanceUrl: props.advanceUrl };
     phase.value = 'playing';
 }
@@ -123,6 +134,8 @@ onMounted(() => {
         wakeLock.request('screen').catch(() => {});
     }
 });
+
+onBeforeUnmount(() => stopSound());
 </script>
 
 <template>
@@ -141,9 +154,9 @@ onMounted(() => {
                     </span>
                 </div>
 
-                <DigitSlots
+                <PuzzleProgress
                     class="order-3 col-span-2 sm:order-2 sm:col-span-1"
-                    :digits="shownDigits"
+                    :solved="shownSolved"
                     :total="totalPuzzles"
                 />
 
@@ -169,15 +182,17 @@ onMounted(() => {
                     leave-to-class="opacity-0"
                 >
                     <div
-                        v-if="phase === 'merged' || phase === 'revealed'"
-                        class="absolute inset-x-3 bottom-3 flex justify-center sm:bottom-5"
+                        v-if="phase === 'merged' || phase === 'saved'"
+                        class="absolute inset-x-3 bottom-3 top-3 flex items-end justify-center sm:bottom-5"
                     >
                         <div
-                            class="flex max-w-full flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-3xl border border-white/20 bg-night-950/80 px-5 py-3 text-center shadow-xl backdrop-blur-md"
+                            class="flex max-h-full w-full max-w-2xl flex-col items-center gap-3 rounded-3xl border border-white/20 bg-night-950/85 px-5 py-4 text-center shadow-xl backdrop-blur-md sm:px-8 sm:py-6"
                             aria-live="polite"
                         >
-                            <p class="font-display text-lg italic text-white sm:text-xl">
-                                {{ board.caption || 'Pięknie ułożone!' }}
+                            <p
+                                class="min-h-0 overflow-y-auto whitespace-pre-line font-display text-lg leading-relaxed text-white sm:text-2xl"
+                            >
+                                {{ board.message || 'Pięknie ułożone!' }}
                             </p>
 
                             <p v-if="failed" class="w-full text-sm text-pink-300">Nie udało się zapisać postępu.</p>
@@ -186,7 +201,7 @@ onMounted(() => {
                                 Spróbuj ponownie
                             </button>
                             <button
-                                v-else-if="phase === 'revealed'"
+                                v-else-if="phase === 'saved'"
                                 type="button"
                                 class="btn-gold px-5 py-2 text-base"
                                 @click="next"
@@ -200,9 +215,9 @@ onMounted(() => {
                                 :disabled="submitting"
                                 @click="advance"
                             >
-                                Odkryj ostatnią cyfrę 🎉
+                                Do finału 🎉
                             </button>
-                            <span v-else class="animate-pulse-soft text-sm text-gold-300">Odkrywam cyfrę…</span>
+                            <span v-else class="animate-pulse-soft text-sm text-gold-300">Zapisuję…</span>
                         </div>
                     </div>
                 </Transition>

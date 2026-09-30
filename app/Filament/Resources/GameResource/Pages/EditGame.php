@@ -20,7 +20,7 @@ class EditGame extends EditRecord
                 ->label('Podgląd jako gracz')
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->url(fn (Game $record): string => route('preview.play', $record))
+                ->url(fn (Game $record): string => route('preview.intro', $record))
                 ->openUrlInNewTab()
                 ->visible(fn (Game $record): bool => $record->puzzles()->exists()),
             Actions\Action::make('resetProgress')
@@ -28,7 +28,7 @@ class EditGame extends EditRecord
                 ->icon('heroicon-o-arrow-path')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalDescription('Gracz zacznie od pierwszego obrazka. Obrazki, kod i życzenia zostają bez zmian.')
+                ->modalDescription('Gracz zacznie od pierwszego obrazka. Obrazki, teksty i muzyka zostają bez zmian.')
                 ->action(function (Game $record): void {
                     $record->resetProgress();
 
@@ -36,20 +36,6 @@ class EditGame extends EditRecord
                 }),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    /**
-     * The code and password are hidden from the model's array form, so they are added back for the admin.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['blik_code'] = $this->getRecord()->blik_code;
-        $data['blik_password'] = $this->getRecord()->blik_password;
-
-        return $data;
     }
 
     protected function getHeaderWidgets(): array

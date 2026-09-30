@@ -52,6 +52,10 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "PHP_INI_SCAN_DIR=\"$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;'):$PWD/.php\" php artisan serve"
+        ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
