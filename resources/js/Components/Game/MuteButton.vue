@@ -8,7 +8,7 @@ const { muted, toggleMute } = useGameAudio();
     <button
         type="button"
         class="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300"
-        :aria-label="muted ? 'Włącz muzykę' : 'Wycisz muzykę'"
+        :aria-label="muted ? 'Włącz muzykę!' : 'Wycisz muzykę!'"
         :aria-pressed="muted"
         @click="toggleMute"
     >
