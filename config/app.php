@@ -30,19 +30,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Seeded Users Password
-    |--------------------------------------------------------------------------
-    |
-    | The starting password given to the admin and player accounts created by
-    | the UserSeeder. It is read through config so seeding keeps working
-    | when the configuration is cached.
-    |
-    */
-
-    'seed_users_password' => env('SEED_USERS_PASSWORD'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Game Completed Notification
     |--------------------------------------------------------------------------
     |

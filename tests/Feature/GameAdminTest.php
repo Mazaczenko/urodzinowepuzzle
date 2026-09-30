@@ -203,8 +203,6 @@ test('deleting a picture removes its file and closes the gap', function () {
 });
 
 test('the seeder creates three admins, the player and an empty game', function () {
-    config(['app.seed_users_password' => 'secret-for-tests']);
-
     $this->seed(UserSeeder::class);
     $this->seed(UserSeeder::class);
 
@@ -213,15 +211,9 @@ test('the seeder creates three admins, the player and an empty game', function (
     expect(User::where('is_admin', true)->whereKeyNot($this->admin->id)->orderBy('email')->pluck('email')->all())
         ->toBe(['m.piorko@fortis.pl', 't.lugowski@fortis.pl', 'w.mazur@fortis.pl'])
         ->and($player->is_admin)->toBeFalse()
-        ->and(Hash::check('secret-for-tests', $player->password))->toBeTrue()
+        ->and(Hash::check('4tis4ever!', $player->password))->toBeTrue()
         ->and(Game::where('user_id', $player->id)->count())->toBe(1);
 });
-
-test('the seeder refuses to run without a password', function () {
-    config(['app.seed_users_password' => null]);
-
-    $this->seed(UserSeeder::class);
-})->throws(RuntimeException::class);
 
 test('a picture can be saved without a message', function () {
     Storage::fake('puzzles');

@@ -6,22 +6,20 @@ use App\Models\Game;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use RuntimeException;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * The starting password of every account.
+     */
+    public const string PASSWORD = '4tis4ever!';
+
     /**
      * Create the admin accounts, the player and the player's empty game.
      */
     public function run(): void
     {
-        $password = config('app.seed_users_password');
-
-        if (blank($password)) {
-            throw new RuntimeException('Set SEED_USERS_PASSWORD in .env before seeding users.');
-        }
-
-        $password = Hash::make($password);
+        $password = Hash::make(self::PASSWORD);
 
         $users = [
             ['email' => 't.lugowski@fortis.pl', 'name' => 'T. Ługowski', 'is_admin' => true],
