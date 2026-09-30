@@ -83,6 +83,9 @@ test('play sends only the current picture and its message', function () {
         ->where('puzzle.number', 3)
         ->where('puzzle.imageUrl', $puzzles[2]->imageUrl())
         ->where('puzzle.message', $puzzles[2]->message)
+        ->where('puzzle.leadMessage', $puzzles[2]->lead_message)
+        ->where('puzzle.grid', ['columns' => 5, 'rows' => 2])
+        ->where('puzzle.hint', 0.16)
         ->where('solvedCount', 2)
         ->where('advanceUrl', route('puzzles.solve', $puzzles[2]))
         ->where('preview', false));
@@ -192,6 +195,7 @@ test('the finale shows the sanitized closing text', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Game/Finale')
             ->where('finaleText', '<p>Sto lat!</p>')
+            ->where('pictureUrl', $game->puzzles->last()->imageUrl())
             ->where('preview', false));
 });
 
@@ -281,4 +285,12 @@ test('the preview shows the look of the previewed game', function () {
 
     $this->actingAs(User::factory()->admin()->create())->get(route('preview.intro', $game))
         ->assertInertia(fn (Assert $page) => $page->where('theme', 'checkers'));
+});
+
+test('later pictures are cut into more pieces', function () {
+    $game = Game::factory()->ready()->create();
+    $game->puzzles->take(6)->each->update(['solved_at' => now()]);
+
+    $this->actingAs($game->user)->get('/play')
+        ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 7)->where('puzzle.grid', ['columns' => 6, 'rows' => 3])->where('puzzle.hint', 0));
 });

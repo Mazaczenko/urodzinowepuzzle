@@ -66,7 +66,10 @@ class GameController extends Controller
                 'id' => $puzzle->id,
                 'number' => $solvedCount + 1,
                 'imageUrl' => $puzzle->imageUrl(),
+                'leadMessage' => $puzzle->lead_message,
                 'message' => $puzzle->message,
+                'grid' => $game->difficulty->grid($solvedCount + 1),
+                'hint' => $game->difficulty->hint($solvedCount + 1),
             ],
             'solvedCount' => $solvedCount,
             'totalPuzzles' => Game::PUZZLES_COUNT,
@@ -90,6 +93,7 @@ class GameController extends Controller
 
         return Inertia::render('Game/Finale', [
             'finaleText' => $game->finaleHtml(),
+            'pictureUrl' => $game->puzzles()->get()->last()?->imageUrl(),
             'musicUrl' => $game->finaleMusicUrl() ?? $game->musicUrl(),
             'preview' => false,
         ]);

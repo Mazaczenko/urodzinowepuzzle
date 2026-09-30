@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Difficulty;
 use App\Enums\GameTheme;
 use App\Filament\Resources\GameResource;
 use App\Filament\Resources\GameResource\Pages\CreateGame;
@@ -233,7 +234,9 @@ test('a picture can be saved without a message', function () {
 
 test('the content seeder builds the whole game from the pictures in public/puzzles', function () {
     Storage::fake('puzzles');
+    Storage::fake('music');
     collect(GameContentSeeder::PUZZLES)->each(fn (array $content) => Storage::disk('puzzles')->put($content['image'], 'image'));
+    collect(GameContentSeeder::MUSIC)->each(fn (string $file) => Storage::disk('music')->put($file, 'mp3'));
 
     $game = Game::factory()->create(['intro_text' => null, 'finale_text' => '<p>Finał</p>']);
 
@@ -246,7 +249,9 @@ test('the content seeder builds the whole game from the pictures in public/puzzl
         ->and($game->finale_text)->toBe('<p>Finał</p>')
         ->and($game->puzzles()->pluck('image_path')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'image'))
         ->and($game->puzzles()->pluck('message')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'message'))
+        ->and($game->puzzles()->pluck('lead_message')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'lead'))
         ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 9))
+        ->and($game->only(array_keys(GameContentSeeder::MUSIC)))->toBe(GameContentSeeder::MUSIC)
         ->and($game->isReady())->toBeTrue();
 });
 
@@ -273,7 +278,7 @@ test('the content seeder keeps pictures and texts added in the panel', function 
 test('an admin can switch the look of the game', function () {
     $game = Game::factory()->create();
 
-    expect($game->fresh()->theme)->toBe(GameTheme::Classic);
+    expect($game->fresh()->theme)->toBe(GameTheme::Fortis);
 
     $this->actingAs($this->admin);
 
@@ -283,4 +288,51 @@ test('an admin can switch the look of the game', function () {
         ->assertHasNoFormErrors();
 
     expect($game->fresh()->theme)->toBe(GameTheme::Checkers);
+});
+
+test('the content seeder fills an empty closing text and replaces its own old messages', function () {
+    Storage::fake('puzzles');
+
+    $game = Game::factory()
+        ->has(Puzzle::factory()->count(2)->state(['message' => 'Czas wrzucić wyższy bieg na te 62. urodziny!']))
+        ->create(['finale_text' => null]);
+    $game->puzzles[1]->update(['message' => 'Własny tekst']);
+
+    $this->seed(GameContentSeeder::class);
+
+    expect($game->fresh()->finale_text)->toBe(GameContentSeeder::FINALE_TEXT)
+        ->and($game->puzzles()->pluck('message')->all())->toBe([GameContentSeeder::PUZZLES[0]['message'], 'Własny tekst']);
+});
+
+test('an admin can set how hard the puzzles are', function () {
+    $game = Game::factory()->create();
+
+    expect($game->fresh()->difficulty)->toBe(Difficulty::Growing);
+
+    $this->actingAs($this->admin);
+
+    Livewire::test(EditGame::class, ['record' => $game->getRouteKey()])
+        ->fillForm(['difficulty' => Difficulty::Hard->value])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($game->fresh()->difficulty)->toBe(Difficulty::Hard);
+});
+
+test('the pictures get more pieces as the game goes on', function () {
+    expect(Difficulty::Growing->grid(1))->toBe(['columns' => 5, 'rows' => 2])
+        ->and(Difficulty::Growing->grid(4))->toBe(['columns' => 5, 'rows' => 3])
+        ->and(Difficulty::Growing->grid(9))->toBe(['columns' => 6, 'rows' => 3])
+        ->and(Difficulty::Easy->grid(9))->toBe(['columns' => 5, 'rows' => 2])
+        ->and(Difficulty::Hard->grid(9))->toBe(['columns' => 8, 'rows' => 3]);
+});
+
+test('the content seeder replaces a closing text draft that was never finished', function () {
+    Storage::fake('puzzles');
+
+    $game = Game::factory()->create(['finale_text' => '<h2>Ekipa dokłada się do [prezent].</h2>']);
+
+    $this->seed(GameContentSeeder::class);
+
+    expect($game->fresh()->finale_text)->toBe(GameContentSeeder::FINALE_TEXT);
 });

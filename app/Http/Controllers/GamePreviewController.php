@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use Illuminate\Contracts\View\View;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,7 +39,10 @@ class GamePreviewController extends Controller
                 'id' => $puzzle->id,
                 'number' => $position,
                 'imageUrl' => $puzzle->imageUrl(),
+                'leadMessage' => $puzzle->lead_message,
                 'message' => $puzzle->message,
+                'grid' => $game->difficulty->grid($position),
+                'hint' => $game->difficulty->hint($position),
             ],
             'solvedCount' => $position - 1,
             'totalPuzzles' => $puzzles->count(),
@@ -55,8 +59,25 @@ class GamePreviewController extends Controller
     {
         return Inertia::render('Game/Finale', [
             'finaleText' => $game->finaleHtml(),
+            'pictureUrl' => $game->puzzles()->get()->last()?->imageUrl(),
             'musicUrl' => $game->finaleMusicUrl() ?? $game->musicUrl(),
             'preview' => true,
+        ]);
+    }
+
+    /**
+     * The QR code on a PRL-style telegram form, sized to print on A5.
+     */
+    public function telegram(Game $game): View
+    {
+        $message = 'WSZYSTKIEGO NAJLEPSZEGO STOP ZESKANUJ KOD OBOK STOP CZEKA NA CIEBIE NIESPODZIANKA STOP UŁÓŻ WSZYSTKO DO KOŃCA STOP';
+
+        return view('telegram', [
+            'qr' => $game->loginQrInkSvg(),
+            'addressee' => mb_strtoupper($game->user?->name ?? 'SOLENIZANT'),
+            'message' => $message,
+            'words' => str_word_count(str_replace('STOP', '', $message), 0, 'ĄĆĘŁŃÓŚŹŻ'),
+            'date' => now()->format('d.m.Y'),
         ]);
     }
 }

@@ -47,8 +47,14 @@ class PuzzlesRelationManager extends RelationManager
                     ->maxSize(12288)
                     ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => Puzzle::storeImage($file))
                     ->required(),
+                Forms\Components\Textarea::make('lead_message')
+                    ->label('Tekst przed ułożeniem')
+                    ->helperText('Opcjonalny. Pokaże się na początku etapu, zanim puzzle się rozsypią, np. zagadka, co będzie na obrazku.')
+                    ->rows(3)
+                    ->autosize()
+                    ->maxLength(2000),
                 Forms\Components\Textarea::make('message')
-                    ->label('Tekst')
+                    ->label('Tekst po ułożeniu')
                     ->helperText('Pokaże się graczowi po ułożeniu tego obrazka. Można zostawić puste i uzupełnić później, także seederem GameContentSeeder.')
                     ->rows(5)
                     ->autosize()
@@ -79,6 +85,12 @@ class PuzzlesRelationManager extends RelationManager
                     Tables\Columns\TextColumn::make('position')
                         ->formatStateUsing(fn (int $state): string => 'Obrazek '.$state)
                         ->weight('bold'),
+                    Tables\Columns\TextColumn::make('lead_message')
+                        ->formatStateUsing(fn (string $state): string => 'Przed: '.$state)
+                        ->limit(120)
+                        ->wrap()
+                        ->color('gray')
+                        ->size('xs'),
                     Tables\Columns\TextColumn::make('message')
                         ->placeholder('Brak tekstu')
                         ->limit(160)

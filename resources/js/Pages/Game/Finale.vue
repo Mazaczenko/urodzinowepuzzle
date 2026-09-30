@@ -14,6 +14,11 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    // The last picture, which shows the whole gift.
+    pictureUrl: {
+        type: String,
+        default: null,
+    },
     musicUrl: {
         type: String,
         default: null,
@@ -94,6 +99,14 @@ onBeforeUnmount(() => {
                 <h1 class="mt-3 font-display text-5xl font-bold text-gold-300 sm:text-6xl">Sto lat!</h1>
                 <p class="mt-2 text-lg text-white/80">Wszystkie obrazki ułożone!</p>
             </header>
+
+            <img
+                v-if="pictureUrl"
+                :src="pictureUrl"
+                alt=""
+                class="w-full rounded-3xl border border-white/20 shadow-2xl shadow-black/40"
+                style="aspect-ratio: 5 / 2"
+            />
 
             <section v-if="hasText" class="glass-card w-full px-6 py-7 sm:px-10">
                 <TypedText :html="finaleText" class="font-display text-xl leading-relaxed text-white/95 sm:text-2xl" />

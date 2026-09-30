@@ -6,15 +6,29 @@ import { themeColor } from '@/theme';
 import Konva from 'konva';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-// Pictures are 5:2, so a 5×2 grid gives square pieces in every orientation.
-const COLUMNS = 5;
-const ROWS = 2;
+// Pictures are 5:2. The frame is sized as if cut 5×2 (square cells), whatever the actual grid.
+const FRAME_COLUMNS = 5;
+const FRAME_ROWS = 2;
 const STROKE_WIDTH = 1.5;
 
 const props = defineProps({
     imageUrl: {
         type: String,
         required: true,
+    },
+    // How the picture is cut; more pieces make it harder.
+    columns: {
+        type: Number,
+        default: 5,
+    },
+    rows: {
+        type: Number,
+        default: 2,
+    },
+    // Opacity of the faded picture in the frame; 0 leaves just the outline.
+    hint: {
+        type: Number,
+        default: 0.16,
     },
 });
 
@@ -47,21 +61,23 @@ function measure() {
 function computeLayout({ width, height }) {
     const portrait = height > width;
     const margin = 12;
-    const piece = Math.max(
+    // The side of one 5×2 cell; the frame and the room around it are measured in these.
+    const cell = Math.max(
         36,
         Math.floor(
             Math.min(
-                (width - 2 * margin) / (COLUMNS + (portrait ? 0.4 : 2.2)),
-                (height - 2 * margin) / (ROWS + (portrait ? 3.4 : 1.7)),
+                (width - 2 * margin) / (FRAME_COLUMNS + (portrait ? 0.4 : 2.2)),
+                (height - 2 * margin) / (FRAME_ROWS + (portrait ? 3.4 : 1.7)),
             ),
         ),
     );
     const frame = {
-        x: Math.round((width - COLUMNS * piece) / 2),
-        y: portrait ? margin + Math.round(piece * 0.2) : Math.round((height - ROWS * piece) / 2),
-        width: COLUMNS * piece,
-        height: ROWS * piece,
+        x: Math.round((width - FRAME_COLUMNS * cell) / 2),
+        y: portrait ? margin + Math.round(cell * 0.2) : Math.round((height - FRAME_ROWS * cell) / 2),
+        width: FRAME_COLUMNS * cell,
+        height: FRAME_ROWS * cell,
     };
+    const piece = { x: frame.width / props.columns, y: frame.height / props.rows };
     const scale = Math.max(frame.width / image.naturalWidth, frame.height / image.naturalHeight);
 
     return {
@@ -83,9 +99,9 @@ function computeLayout({ width, height }) {
  * Pick a starting spot for every piece: a shuffled grid of cells outside the frame, with some jitter.
  */
 function scatterSpots({ width, height, piece, frame }, count) {
-    const inset = piece * 0.62;
-    const columns = Math.max(1, Math.floor((width - 2 * inset) / (piece * 1.02)) + 1);
-    const rows = Math.max(1, Math.floor((height - 2 * inset) / (piece * 1.02)) + 1);
+    const inset = Math.max(piece.x, piece.y) * 0.62;
+    const columns = Math.max(1, Math.floor((width - 2 * inset) / (piece.x * 1.02)) + 1);
+    const rows = Math.max(1, Math.floor((height - 2 * inset) / (piece.y * 1.02)) + 1);
     const stepX = columns > 1 ? (width - 2 * inset) / (columns - 1) : 0;
     const stepY = rows > 1 ? (height - 2 * inset) / (rows - 1) : 0;
     const free = [];
@@ -102,7 +118,7 @@ function scatterSpots({ width, height, piece, frame }, count) {
     }
 
     const spots = [...gsap.utils.shuffle(free), ...gsap.utils.shuffle(covered)];
-    const jitter = piece * 0.08;
+    const jitter = Math.min(piece.x, piece.y) * 0.08;
 
     return Array.from({ length: count }, (_, index) => {
         const spot = spots[index % spots.length];
@@ -149,11 +165,11 @@ function build() {
         width: size.width,
         height: size.height,
         pieceSize: piece,
-        proximity: gsap.utils.clamp(14, 28, piece * 0.22),
+        proximity: gsap.utils.clamp(12, 28, Math.min(piece.x, piece.y) * 0.22),
         strokeWidth: STROKE_WIDTH,
         strokeColor: 'rgba(255, 255, 255, 0.85)',
         // Headbreaker lays the puzzle out one piece away from the origin; shift the picture to match.
-        image: { content: image, scale, offset: { x: overflow.x - piece, y: overflow.y - piece } },
+        image: { content: image, scale, offset: { x: overflow.x - piece.x, y: overflow.y - piece.y } },
         outline: new headbreaker.outline.Rounded(),
         painter: new headbreaker.painters.Konva(),
         preventOffstageDrag: true,
@@ -161,8 +177,8 @@ function build() {
     });
 
     canvas.autogenerate({
-        horizontalPiecesCount: COLUMNS,
-        verticalPiecesCount: ROWS,
+        horizontalPiecesCount: props.columns,
+        verticalPiecesCount: props.rows,
         insertsGenerator: headbreaker.generators.random,
     });
 
@@ -174,8 +190,8 @@ function build() {
         return Math.abs(to.x - from.x - dx) < 1 && Math.abs(to.y - from.y - dy) < 1;
     };
 
-    canvas.puzzle.attachHorizontalConnectionRequirement(isNeighbour(piece, 0));
-    canvas.puzzle.attachVerticalConnectionRequirement(isNeighbour(0, piece));
+    canvas.puzzle.attachHorizontalConnectionRequirement(isNeighbour(piece.x, 0));
+    canvas.puzzle.attachVerticalConnectionRequirement(isNeighbour(0, piece.y));
     canvas.puzzle.forceConnectionWhileDragging();
 
     // Shuffling connects neighbours that happen to land side by side, so deal again until none are.
@@ -203,7 +219,7 @@ function build() {
     stage = pieceLayer.getStage();
 
     const hintLayer = new Konva.Layer({ listening: false });
-    const hint = pictureNode({ opacity: 0.16 });
+    const hint = pictureNode({ opacity: props.hint });
 
     hintLayer.add(
         new Konva.Rect({
@@ -292,8 +308,8 @@ function onSolved() {
         return figure.group.position();
     });
     const shift = {
-        x: frame.x - piece / 2 - (starts[0].x - head.metadata.targetPosition.x),
-        y: frame.y - piece / 2 - (starts[0].y - head.metadata.targetPosition.y),
+        x: frame.x - piece.x / 2 - (starts[0].x - head.metadata.targetPosition.x),
+        y: frame.y - piece.y / 2 - (starts[0].y - head.metadata.targetPosition.y),
     };
 
     const coverLayer = new Konva.Layer({ listening: false });

@@ -2,10 +2,11 @@ import { usePage } from '@inertiajs/vue3';
 import { useStorage } from '@vueuse/core';
 import { computed, ref } from 'vue';
 
+// The first one is the default.
 export const THEMES = [
-    { value: 'classic', label: 'Podstawowy', sparkle: '✦' },
-    { value: 'checkers', label: 'Warcaby', sparkle: '🏁' },
     { value: 'fortis', label: 'Fortis', sparkle: '▲' },
+    { value: 'classic', label: 'Nocne niebo', sparkle: '✦' },
+    { value: 'checkers', label: 'Warcaby', sparkle: '🏁' },
 ];
 
 const PREVIEW_KEY = 'puzzle-preview-theme';

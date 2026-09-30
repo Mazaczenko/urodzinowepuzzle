@@ -1,5 +1,6 @@
 <script setup>
 import JigsawBoard from '@/Components/Game/JigsawBoard.vue';
+import LogoutButton from '@/Components/Game/LogoutButton.vue';
 import MuteButton from '@/Components/Game/MuteButton.vue';
 import PuzzleProgress from '@/Components/Game/PuzzleProgress.vue';
 import ThemeSwitcher from '@/Components/Game/ThemeSwitcher.vue';
@@ -49,8 +50,10 @@ const wakeLock = useWakeLock();
 const board = ref({ ...props.puzzle, advanceUrl: props.advanceUrl });
 const shownSolved = ref(props.solvedCount);
 
-// playing → merging (picture slides together) → merged (message shows) → saved (progress is stored)
-const phase = ref('playing');
+// lead (text before the level, if any) → playing → merging (picture slides together)
+// → merged (message shows) → saved (progress is stored)
+const startPhase = (puzzle) => (puzzle.leadMessage ? 'lead' : 'playing');
+const phase = ref(startPhase(props.puzzle));
 const submitting = ref(false);
 const failed = ref(false);
 
@@ -121,7 +124,7 @@ function advance() {
 function next() {
     stopSound();
     board.value = { ...props.puzzle, advanceUrl: props.advanceUrl };
-    phase.value = 'playing';
+    phase.value = startPhase(board.value);
 }
 
 function reload() {
@@ -165,18 +168,50 @@ onBeforeUnmount(() => stopSound());
                 <div class="relative z-20 order-2 flex gap-2 justify-self-end sm:order-3">
                     <ThemeSwitcher :preview="preview" />
                     <MuteButton />
+                    <LogoutButton v-if="!preview" />
                 </div>
             </header>
 
             <main class="glass-card relative min-h-0 flex-1 overflow-hidden">
+                <!-- Mounted only once the level starts, so the pieces scatter and the clock runs from then. -->
                 <JigsawBoard
+                    v-if="phase !== 'lead'"
                     :key="board.id"
                     :image-url="board.imageUrl"
+                    :columns="board.grid.columns"
+                    :rows="board.grid.rows"
+                    :hint="board.hint"
                     @grab="sfx.pick()"
                     @connect="sfx.snap()"
                     @solved="onSolved"
                     @merged="onMerged"
                 />
+
+                <Transition
+                    enter-active-class="transition duration-500 ease-out"
+                    enter-from-class="scale-95 opacity-0"
+                    leave-active-class="pointer-events-none transition duration-200 ease-in"
+                    leave-to-class="opacity-0"
+                >
+                    <div v-if="phase === 'lead'" class="absolute inset-0 flex items-center justify-center p-3 sm:p-6">
+                        <div
+                            class="flex max-h-full w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border border-white/20 bg-night-950/70 px-5 py-6 text-center shadow-xl backdrop-blur-md sm:px-10 sm:py-10"
+                            aria-live="polite"
+                        >
+                            <p class="text-sm font-medium uppercase tracking-widest text-gold-300">
+                                Etap {{ board.number }} z {{ totalPuzzles }}
+                            </p>
+                            <p
+                                class="min-h-0 overflow-y-auto whitespace-pre-line font-display text-xl leading-relaxed text-white sm:text-3xl"
+                            >
+                                {{ board.leadMessage }}
+                            </p>
+                            <button type="button" class="btn-gold px-6 py-2.5 text-base" @click="phase = 'playing'">
+                                Układam 🧩
+                            </button>
+                        </div>
+                    </div>
+                </Transition>
 
                 <Transition
                     enter-active-class="transition duration-500 ease-out"

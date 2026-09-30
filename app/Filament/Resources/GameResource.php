@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Difficulty;
 use App\Enums\GameTheme;
 use App\Filament\Resources\GameResource\Pages;
 use App\Filament\Resources\GameResource\RelationManagers;
@@ -40,13 +41,22 @@ class GameResource extends Resource
                             ->validationMessages(['unique' => 'Ten gracz ma już swoją grę.'])
                             ->required(),
                     ]),
+                Forms\Components\Section::make('Trudność')
+                    ->description('Na ile kawałków jest cięty każdy obrazek.')
+                    ->schema([
+                        Forms\Components\Radio::make('difficulty')
+                            ->hiddenLabel()
+                            ->options(Difficulty::class)
+                            ->default(Difficulty::Growing)
+                            ->required(),
+                    ]),
                 Forms\Components\Section::make('Wygląd')
                     ->description('Styl ekranów gry, od logowania po finał. W podglądzie można szybko porównać style bez zapisywania.')
                     ->schema([
                         Forms\Components\Radio::make('theme')
                             ->hiddenLabel()
                             ->options(GameTheme::class)
-                            ->default(GameTheme::Classic)
+                            ->default(GameTheme::Fortis)
                             ->required(),
                     ]),
                 Forms\Components\Section::make('Teksty')

@@ -1,9 +1,11 @@
 <script setup>
+import LogoutButton from '@/Components/Game/LogoutButton.vue';
 import MuteButton from '@/Components/Game/MuteButton.vue';
 import StarField from '@/Components/Game/StarField.vue';
 import ThemeSwitcher from '@/Components/Game/ThemeSwitcher.vue';
 import { themeColor, useTheme } from '@/theme';
-import { toRef, watchEffect } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { computed, toRef, watchEffect } from 'vue';
 
 const props = defineProps({
     // Lock the page to the viewport, for screens that must not scroll (the puzzle board).
@@ -22,6 +24,10 @@ const props = defineProps({
 });
 
 const theme = useTheme(toRef(props, 'preview'));
+
+// Not on the login screen, and not in the preview, where it would log the admin out.
+const page = usePage();
+const canLogOut = computed(() => Boolean(page.props.auth?.user) && !props.preview);
 
 // On <html>, so the page behind the layout and the browser bar follow the theme too.
 watchEffect(() => {
@@ -47,9 +53,11 @@ watchEffect(() => {
         <div v-if="!fill" class="absolute right-3 top-3 z-20 flex gap-2 sm:right-5 sm:top-5" :class="{ 'mt-7': preview }">
             <ThemeSwitcher :preview="preview" />
             <MuteButton v-if="mute" />
+            <LogoutButton v-if="canLogOut" />
         </div>
 
-        <div class="relative z-10 flex min-h-0 flex-1 flex-col">
+        <!-- On phones the corner buttons would cover the top of the card, so the content starts below them. -->
+        <div class="relative z-10 flex min-h-0 flex-1 flex-col" :class="{ 'pt-14 sm:pt-0': !fill }">
             <slot />
         </div>
     </div>

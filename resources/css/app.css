@@ -4,10 +4,28 @@
 
 /*
  * Themes. Colours are RGB channels so Tailwind can add opacity (bg-gold-300/50).
- * The default applies everywhere; GameLayout sets data-theme on <html> from the game's setting.
+ * Fortis is the default; the page template and GameLayout set data-theme on <html>.
  */
 @layer base {
+    /* The fortis.pl palette: dark blue, lime, blue and green. First, as the default the others override. */
     :root,
+    [data-theme='fortis'] {
+        --color-night-700: 22 57 92;
+        --color-night-800: 17 43 69;
+        --color-night-900: 13 33 52;
+        --color-night-950: 8 19 31;
+        --color-gold-200: 229 246 159;
+        --color-gold-300: 207 240 64;
+        --color-gold-400: 185 225 12;
+        --color-gold-500: 156 194 10;
+        --color-gold-600: 122 154 6;
+        --color-glow-a: 1 106 181;
+        --color-glow-b: 89 168 47;
+        --font-sans: 'Ubuntu';
+        --font-display: 'Ubuntu';
+    }
+
+    /* Night sky: dark violet, gold and stars. */
     [data-theme='classic'] {
         --color-night-700: 59 29 110;
         --color-night-800: 42 20 85;
@@ -39,23 +57,6 @@
         --color-glow-b: 255 255 255;
         --font-sans: 'Fredoka';
         --font-display: 'Russo One';
-    }
-
-    /* The fortis.pl palette: dark blue, lime, blue and green. */
-    [data-theme='fortis'] {
-        --color-night-700: 22 57 92;
-        --color-night-800: 17 43 69;
-        --color-night-900: 13 33 52;
-        --color-night-950: 8 19 31;
-        --color-gold-200: 229 246 159;
-        --color-gold-300: 207 240 64;
-        --color-gold-400: 185 225 12;
-        --color-gold-500: 156 194 10;
-        --color-gold-600: 122 154 6;
-        --color-glow-a: 1 106 181;
-        --color-glow-b: 89 168 47;
-        --font-sans: 'Ubuntu';
-        --font-display: 'Ubuntu';
     }
 
     html,

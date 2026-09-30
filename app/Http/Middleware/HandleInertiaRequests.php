@@ -52,6 +52,6 @@ class HandleInertiaRequests extends Middleware
             $game = $request->user()?->game ?? Game::query()->oldest('id')->first();
         }
 
-        return $game->theme ?? GameTheme::Classic;
+        return $game->theme ?? GameTheme::Fortis;
     }
 }

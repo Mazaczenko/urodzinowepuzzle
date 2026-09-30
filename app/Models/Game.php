@@ -2,16 +2,28 @@
 
 namespace App\Models;
 
+use App\Enums\Difficulty;
 use App\Enums\GameTheme;
+use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\GDLibRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\Fill;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Database\Factories\GameFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
-#[Fillable(['user_id', 'theme', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
+#[Hidden(['login_token'])]
+#[Fillable(['user_id', 'theme', 'difficulty', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
 class Game extends Model
 {
     /** @use HasFactory<GameFactory> */
@@ -26,7 +38,8 @@ class Game extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'theme' => 'classic',
+        'theme' => 'fortis',
+        'difficulty' => 'growing',
     ];
 
     /**
@@ -38,6 +51,7 @@ class Game extends Model
     {
         return [
             'theme' => GameTheme::class,
+            'difficulty' => Difficulty::class,
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];
@@ -135,6 +149,47 @@ class Game extends Model
     /**
      * Same-origin URL, so the browser can fetch and decode the track whatever host the game is opened on.
      */
+    /**
+     * The link that logs the player straight in, for the QR code. Anyone holding it can play,
+     * so a new token can be generated to make the old link and code stop working.
+     */
+    public function loginUrl(): string
+    {
+        if (blank($this->login_token)) {
+            $this->regenerateLoginToken();
+        }
+
+        return route('game.qr-login', $this->login_token);
+    }
+
+    public function regenerateLoginToken(): void
+    {
+        $this->forceFill(['login_token' => Str::random(40)])->save();
+    }
+
+    public function loginQrSvg(int $size = 320): string
+    {
+        return (new Writer(new ImageRenderer(new RendererStyle($size, 2), new SvgImageBackEnd)))->writeString($this->loginUrl());
+    }
+
+    /**
+     * The QR code in dark ink on a transparent background, to sit on the telegram's paper.
+     */
+    public function loginQrInkSvg(int $size = 320): string
+    {
+        $fill = Fill::uniformColor(new Alpha(0, new Rgb(255, 255, 255)), new Rgb(35, 38, 46));
+
+        return (new Writer(new ImageRenderer(new RendererStyle($size, 0, fill: $fill), new SvgImageBackEnd)))->writeString($this->loginUrl());
+    }
+
+    /**
+     * A PNG of the QR code, sized for print.
+     */
+    public function loginQrPng(int $size = 1024): string
+    {
+        return (new Writer(new GDLibRenderer($size, 2)))->writeString($this->loginUrl());
+    }
+
     public function introHtml(): string
     {
         return (string) str($this->intro_text ?? '')->sanitizeHtml();
