@@ -57,6 +57,23 @@ test('an admin can create a game for the player', function () {
         ->wishes->toBe('<p>Sto lat!</p>');
 });
 
+test('saving a game without retyping the code keeps the code', function () {
+    $game = Game::factory()->create(['blik_code' => '987654321', 'blik_password' => 'tajne']);
+
+    $this->actingAs($this->admin);
+
+    Livewire::test(EditGame::class, ['record' => $game->getRouteKey()])
+        ->assertFormSet(['blik_code' => '987654321', 'blik_password' => 'tajne'])
+        ->fillForm(['wishes' => '<p>Nowe życzenia</p>'])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($game->fresh())
+        ->blik_code->toBe('987654321')
+        ->blik_password->toBe('tajne')
+        ->wishes->toBe('<p>Nowe życzenia</p>');
+});
+
 test('the blik code must be exactly nine digits', function (string $code) {
     $this->actingAs($this->admin);
 

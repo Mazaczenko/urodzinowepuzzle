@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectAdminToPanel
@@ -16,7 +17,8 @@ class RedirectAdminToPanel
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user()?->is_admin) {
-            return redirect('/admin');
+            // The panel is not an Inertia page, so Inertia visits need a full page load to get there.
+            return Inertia::location('/admin');
         }
 
         return $next($request);

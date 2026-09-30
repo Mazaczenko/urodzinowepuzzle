@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\Game;
 use App\Models\Puzzle;
 use App\Models\User;
@@ -14,6 +15,16 @@ test('admins are sent to the panel instead of the game', function (string $uri) 
 
     $this->actingAs($admin)->get($uri)->assertRedirect('/admin');
 })->with(['/', '/play', '/finale']);
+
+test('an admin logging in through the game is taken out of the single page app', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->withHeaders(['X-Inertia' => 'true', 'X-Inertia-Version' => app(HandleInertiaRequests::class)->version(request())])
+        ->get('/')
+        ->assertStatus(409)
+        ->assertHeader('X-Inertia-Location', '/admin');
+});
 
 test('an admin cannot solve puzzles', function () {
     $game = Game::factory()->ready()->create();
@@ -75,6 +86,15 @@ test('play sends only the current picture and the digits earned so far', functio
     $response->assertDontSee('987654321');
     $response->assertDontSee($puzzles[3]->image_path);
 });
+
+test('no game screen leaks the code before the finale', function (string $uri) {
+    $game = Game::factory()->ready()->create(['blik_code' => '987654321', 'blik_password' => 'tajne-haslo']);
+
+    $this->actingAs($game->user)->get($uri)
+        ->assertOk()
+        ->assertDontSee('987654321')
+        ->assertDontSee('tajne-haslo');
+})->with(['/', '/play']);
 
 test('opening the board starts the game clock once', function () {
     $game = Game::factory()->ready()->create();

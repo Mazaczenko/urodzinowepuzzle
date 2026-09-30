@@ -38,6 +38,20 @@ class EditGame extends EditRecord
         ];
     }
 
+    /**
+     * The code and password are hidden from the model's array form, so they are added back for the admin.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['blik_code'] = $this->getRecord()->blik_code;
+        $data['blik_password'] = $this->getRecord()->blik_password;
+
+        return $data;
+    }
+
     protected function getHeaderWidgets(): array
     {
         return [

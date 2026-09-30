@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Validation\Rule;
 
 class GameResource extends Resource
@@ -35,7 +36,7 @@ class GameResource extends Resource
                             ->label('Gracz')
                             ->relationship('user', 'name', fn (Builder $query) => $query->where('is_admin', false))
                             ->unique(ignoreRecord: true)
-                            ->rule(Rule::exists('users', 'id')->where('is_admin', false))
+                            ->rule(Rule::exists('users', 'id')->where(fn (QueryBuilder $query) => $query->where('is_admin', false)))
                             ->validationMessages(['unique' => 'Ten gracz ma już swoją grę.'])
                             ->required()
                             ->columnSpanFull(),

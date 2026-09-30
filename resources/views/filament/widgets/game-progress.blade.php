@@ -1,10 +1,11 @@
+{{-- Layout uses inline styles: the panel's stylesheet only ships the utility classes Filament itself uses. --}}
 <x-filament-widgets::widget>
     <x-filament::section heading="Postęp gracza" icon="heroicon-o-chart-bar">
         <div wire:poll.10s>
             @if ($game === null)
                 <p class="text-sm text-gray-500 dark:text-gray-400">Nie ma jeszcze żadnej gry.</p>
             @else
-                <div class="grid gap-4 sm:grid-cols-4">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1rem;">
                     <div>
                         <div class="text-sm text-gray-500 dark:text-gray-400">Gracz</div>
                         <div class="font-medium">{{ $game->user?->name ?? '—' }}</div>
@@ -30,13 +31,13 @@
                 </div>
 
                 @if ($missingParts)
-                    <p class="mt-4 text-sm font-medium text-warning-600 dark:text-warning-400">
+                    <p class="text-sm font-medium text-warning-600 dark:text-warning-400" style="margin-top: 1rem;">
                         Gra nie jest jeszcze gotowa. {{ $missingParts }}.
                     </p>
                 @endif
 
                 @if ($puzzles->isNotEmpty())
-                    <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-9">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: 0.5rem; margin-top: 1rem;">
                         @foreach ($puzzles as $puzzle)
                             <div @class([
                                 'rounded-lg border px-2 py-2 text-center text-sm',

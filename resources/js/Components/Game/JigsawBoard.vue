@@ -101,7 +101,7 @@ function scatterSpots({ width, height, piece, frame }, count) {
     }
 
     const spots = [...gsap.utils.shuffle(free), ...gsap.utils.shuffle(covered)];
-    const jitter = piece * 0.12;
+    const jitter = piece * 0.08;
 
     return Array.from({ length: count }, (_, index) => {
         const spot = spots[index % spots.length];

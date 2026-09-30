@@ -165,7 +165,7 @@ onMounted(() => {
                 <Transition
                     enter-active-class="transition duration-500 ease-out"
                     enter-from-class="translate-y-4 opacity-0"
-                    leave-active-class="transition duration-200 ease-in"
+                    leave-active-class="pointer-events-none transition duration-200 ease-in"
                     leave-to-class="opacity-0"
                 >
                     <div
