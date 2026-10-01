@@ -40,6 +40,15 @@ class GameResource extends Resource
                             ->rule(Rule::exists('users', 'id')->where(fn (QueryBuilder $query) => $query->where('is_admin', false)))
                             ->validationMessages(['unique' => 'Ten gracz ma już swoją grę.'])
                             ->required(),
+                        Forms\Components\TextInput::make('player_password')
+                            ->label('Hasło gracza')
+                            ->helperText('Zapisanie zmienia hasło konta gracza. Login i to hasło są wydrukowane na telegramie, na wypadek gdyby kod QR nie zadziałał.')
+                            ->minLength(8)
+                            ->maxLength(64)
+                            ->suffixAction(Forms\Components\Actions\Action::make('generatePlayerPassword')
+                                ->label('Wygeneruj')
+                                ->icon('heroicon-o-sparkles')
+                                ->action(fn (Forms\Set $set) => $set('player_password', Game::generatePlayerPassword()))),
                     ]),
                 Forms\Components\Section::make('Trudność')
                     ->description('Na ile kawałków jest cięty każdy obrazek.')

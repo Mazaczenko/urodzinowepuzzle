@@ -75,6 +75,20 @@ class EditGame extends EditRecord
         ];
     }
 
+    /**
+     * The player password is hidden from serialization, so the form gets it explicitly;
+     * otherwise saving the form would clear it.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['player_password'] = $this->getRecord()->player_password;
+
+        return $data;
+    }
+
     protected function getHeaderWidgets(): array
     {
         return [

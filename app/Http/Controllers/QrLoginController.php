@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class QrLoginController extends Controller
 {
     /**
-     * Log the player in from the link in the QR code, whoever was logged in on this device before.
+     * Log the player in from the link in the QR code, whoever was logged in on this device before,
+     * and take them straight to the puzzles.
      */
     public function __invoke(Request $request, string $token): RedirectResponse
     {
@@ -24,6 +25,6 @@ class QrLoginController extends Controller
         Auth::guard('web')->login($game->user, remember: true);
         $request->session()->regenerate();
 
-        return to_route('game.intro');
+        return to_route('game.play');
     }
 }

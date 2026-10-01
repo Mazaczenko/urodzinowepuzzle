@@ -22,8 +22,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-#[Hidden(['login_token'])]
-#[Fillable(['user_id', 'theme', 'difficulty', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'started_at', 'completed_at'])]
+#[Hidden(['login_token', 'player_password'])]
+#[Fillable(['user_id', 'theme', 'difficulty', 'intro_text', 'finale_text', 'music_path', 'finale_music_path', 'completion_sound_path', 'player_password', 'started_at', 'completed_at'])]
 class Game extends Model
 {
     /** @use HasFactory<GameFactory> */
@@ -54,7 +54,19 @@ class Game extends Model
             'difficulty' => Difficulty::class,
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
+            // Kept readable (encrypted, not hashed) so it can be printed on the telegram.
+            'player_password' => 'encrypted',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // The password printed on the telegram is the one the player's account actually logs in with.
+        static::saved(function (Game $game): void {
+            if (filled($game->player_password) && $game->wasChanged(['player_password', 'user_id'])) {
+                $game->user?->update(['password' => $game->player_password]);
+            }
+        });
     }
 
     /**
@@ -161,6 +173,16 @@ class Game extends Model
         }
 
         return rtrim(config('app.player_url'), '/').route('game.qr-login', $this->login_token, absolute: false);
+    }
+
+    /**
+     * Easy to type off paper: no look-alike characters such as l/1 or O/0.
+     */
+    public static function generatePlayerPassword(): string
+    {
+        $alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
+
+        return 'rower-'.collect(range(1, 6))->map(fn (): string => $alphabet[random_int(0, strlen($alphabet) - 1)])->implode('');
     }
 
     public function regenerateLoginToken(): void

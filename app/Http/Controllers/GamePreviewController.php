@@ -67,7 +67,8 @@ class GamePreviewController extends Controller
     }
 
     /**
-     * The QR code on a PRL-style telegram form, sized to print on A5.
+     * The QR code on a PRL-style telegram form, sized to print on A5, with the login and password
+     * in case the code does not scan.
      */
     public function telegram(Game $game): View
     {
@@ -79,6 +80,9 @@ class GamePreviewController extends Controller
             'message' => $message,
             'words' => str_word_count(str_replace('STOP', '', $message), 0, 'ĄĆĘŁŃÓŚŹŻ'),
             'date' => now()->format('d.m.Y'),
+            'site' => parse_url(config('app.player_url'), PHP_URL_HOST),
+            'login' => $game->user?->email,
+            'password' => $game->player_password,
         ]);
     }
 }

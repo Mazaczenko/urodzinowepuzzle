@@ -214,6 +214,11 @@
                 word-spacing: 0.15em;
             }
 
+            /* Login and password are case-sensitive, so they are typed as they are. */
+            .message .as-is {
+                text-transform: none;
+            }
+
             .attachment {
                 display: flex;
                 flex-direction: column;
@@ -299,6 +304,9 @@
             <a href="{{ url('/admin') }}">Wróć do panelu</a>
         </div>
         <p class="hint">Format A5 poziomo. W oknie drukowania włącz „Grafika tła”, żeby zachować kolor papieru.</p>
+        @if (blank($password))
+            <p class="hint" style="color: #f2b8b0;">Brak hasła gracza: ustaw je w panelu przy grze, żeby trafiło na telegram.</p>
+        @endif
 
         <article class="sheet">
             <header>
@@ -327,7 +335,14 @@
                 <div>
                     <div class="label">Treść</div>
                     <div class="message">
-                        <p class="typed">{{ $message }}</p>
+                        <p class="typed">
+                            {{ $message }}<br>
+                            LUB WEJDŹ NA {{ mb_strtoupper($site) }} STOP<br>
+                            LOGIN: <span class="as-is">{{ $login }}</span><br>
+                            @if (filled($password))
+                                HASŁO: <span class="as-is">{{ $password }}</span>
+                            @endif
+                        </p>
                     </div>
                 </div>
 
