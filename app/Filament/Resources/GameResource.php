@@ -193,6 +193,15 @@ class GameResource extends Resource
         return Forms\Components\FileUpload::make($name)
             ->disk('music')
             ->acceptedFileTypes(['audio/mpeg'])
-            ->maxSize(30720);
+            ->maxSize(30720)
+            // A way out when the stored file cannot be loaded and the upload box keeps spinning.
+            ->hintAction(
+                Forms\Components\Actions\Action::make('clear')
+                    ->label('Usuń plik')
+                    ->icon('heroicon-m-trash')
+                    ->color('danger')
+                    ->visible(fn (mixed $state): bool => filled($state))
+                    ->action(fn (Forms\Set $set) => $set($name, null)),
+            );
     }
 }

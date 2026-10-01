@@ -319,6 +319,27 @@ test('an admin can set how hard the puzzles are', function () {
     expect($game->fresh()->difficulty)->toBe(Difficulty::Hard);
 });
 
+test('an admin can clear a music file that will not load', function () {
+    Storage::fake('music');
+    Storage::disk('music')->put('song.mp3', 'mp3');
+
+    $game = Game::factory()->create(['music_path' => 'song.mp3']);
+
+    $this->actingAs($this->admin);
+
+    Livewire::test(EditGame::class, ['record' => $game->getRouteKey()])
+        ->callFormComponentAction('music_path', 'clear')
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($game->fresh()->music_path)->toBeNull();
+});
+
+test('stored files are linked relative to the host the panel is opened on', function () {
+    expect(Storage::disk('music')->url('song.mp3'))->toBe('/music/song.mp3')
+        ->and(Storage::disk('puzzles')->url('picture.webp'))->toBe('/puzzles/picture.webp');
+});
+
 test('the pictures get more pieces as the game goes on', function () {
     expect(Difficulty::Growing->grid(1))->toBe(['columns' => 3, 'rows' => 3])
         ->and(Difficulty::Growing->grid(3))->toBe(['columns' => 4, 'rows' => 4])

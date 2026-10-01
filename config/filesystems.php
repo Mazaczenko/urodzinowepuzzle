@@ -51,17 +51,18 @@ return [
         'puzzles' => [
             'driver' => 'local',
             'root' => public_path('puzzles'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/puzzles',
+            // Relative, so the admin panel fetches files from whatever host it is opened on.
+            'url' => '/puzzles',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
         ],
 
-        // Music is served from the web root as well, for the same reason.
+        // Music is served from the web root as well, for the same reasons.
         'music' => [
             'driver' => 'local',
             'root' => public_path('music'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/music',
+            'url' => '/music',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
