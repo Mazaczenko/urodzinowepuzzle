@@ -34,12 +34,12 @@ class PuzzlesRelationManager extends RelationManager
             ->schema([
                 Forms\Components\FileUpload::make('image_path')
                     ->label('Obrazek')
-                    ->helperText('Zostanie przycięty do proporcji 5:2 i zapisany jako WebP.')
+                    ->helperText('Zostanie przycięty do kwadratu i zapisany jako WebP.')
                     ->image()
                     ->imageEditor()
-                    ->imageEditorAspectRatios(['5:2'])
+                    ->imageEditorAspectRatios(['1:1'])
                     ->imageResizeMode('cover')
-                    ->imageCropAspectRatio('5:2')
+                    ->imageCropAspectRatio('1:1')
                     ->imageResizeTargetWidth((string) Puzzle::IMAGE_WIDTH)
                     ->imageResizeTargetHeight((string) Puzzle::IMAGE_HEIGHT)
                     ->imagePreviewHeight('260')
@@ -83,9 +83,9 @@ class PuzzlesRelationManager extends RelationManager
                     Tables\Columns\ImageColumn::make('image_path')
                         ->label('Obrazek')
                         ->disk('puzzles')
-                        ->height(140)
+                        ->height(260)
                         ->width('100%')
-                        ->extraImgAttributes(['class' => 'rounded-lg object-cover', 'style' => 'aspect-ratio: 5 / 2; width: 100%; height: auto;']),
+                        ->extraImgAttributes(['class' => 'rounded-lg object-cover', 'style' => 'aspect-ratio: 1 / 1; width: 100%; height: auto;']),
                     Tables\Columns\TextColumn::make('position')
                         ->formatStateUsing(fn (int $state): string => 'Obrazek '.$state)
                         ->weight('bold'),

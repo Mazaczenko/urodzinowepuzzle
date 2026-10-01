@@ -22,11 +22,11 @@ class Puzzle extends Model
     use HasFactory;
 
     /**
-     * Every picture is cut into a 5×2 grid of square pieces, so it has to be 5:2.
+     * Every picture is square.
      */
-    public const int IMAGE_WIDTH = 1600;
+    public const int IMAGE_WIDTH = 1200;
 
-    public const int IMAGE_HEIGHT = 640;
+    public const int IMAGE_HEIGHT = 1200;
 
     /**
      * Get the attributes that should be cast.
@@ -79,7 +79,7 @@ class Puzzle extends Model
     }
 
     /**
-     * Crop an uploaded picture to 5:2, compress it to WebP and store it in public/puzzles.
+     * Crop an uploaded picture to a square, compress it to WebP and store it in public/puzzles.
      */
     public static function storeImage(UploadedFile $file): string
     {

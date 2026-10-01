@@ -93,7 +93,7 @@ test('resetting progress clears solve times and dates but keeps the content', fu
         ->and($game->puzzles()->whereNotNull('solved_at')->orWhereNotNull('solve_seconds')->count())->toBe(0);
 });
 
-test('uploaded pictures are cropped to 5:2 and stored as webp', function () {
+test('uploaded pictures are cropped to a square and stored as webp', function () {
     Storage::fake('puzzles');
 
     $path = Puzzle::storeImage(UploadedFile::fake()->image('photo.jpg', 2000, 1500));
@@ -320,11 +320,11 @@ test('an admin can set how hard the puzzles are', function () {
 });
 
 test('the pictures get more pieces as the game goes on', function () {
-    expect(Difficulty::Growing->grid(1))->toBe(['columns' => 5, 'rows' => 2])
-        ->and(Difficulty::Growing->grid(3))->toBe(['columns' => 5, 'rows' => 3])
-        ->and(Difficulty::Growing->grid(6))->toBe(['columns' => 6, 'rows' => 3])
-        ->and(Difficulty::Easy->grid(6))->toBe(['columns' => 5, 'rows' => 2])
-        ->and(Difficulty::Hard->grid(6))->toBe(['columns' => 8, 'rows' => 3]);
+    expect(Difficulty::Growing->grid(1))->toBe(['columns' => 3, 'rows' => 3])
+        ->and(Difficulty::Growing->grid(3))->toBe(['columns' => 4, 'rows' => 4])
+        ->and(Difficulty::Growing->grid(6))->toBe(['columns' => 5, 'rows' => 4])
+        ->and(Difficulty::Easy->grid(6))->toBe(['columns' => 3, 'rows' => 3])
+        ->and(Difficulty::Hard->grid(6))->toBe(['columns' => 5, 'rows' => 5]);
 });
 
 test('the content seeder replaces a closing text draft that was never finished', function () {

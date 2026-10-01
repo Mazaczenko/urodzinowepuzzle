@@ -6,9 +6,6 @@ import { themeColor } from '@/theme';
 import Konva from 'konva';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-// Pictures are 5:2. The frame is sized as if cut 5×2 (square cells), whatever the actual grid.
-const FRAME_COLUMNS = 5;
-const FRAME_ROWS = 2;
 const STROKE_WIDTH = 1.5;
 
 const props = defineProps({
@@ -19,11 +16,11 @@ const props = defineProps({
     // How the picture is cut; more pieces make it harder.
     columns: {
         type: Number,
-        default: 5,
+        default: 3,
     },
     rows: {
         type: Number,
-        default: 2,
+        default: 3,
     },
     // Opacity of the faded picture in the frame; 0 leaves just the outline.
     hint: {
@@ -61,21 +58,21 @@ function measure() {
 function computeLayout({ width, height }) {
     const portrait = height > width;
     const margin = 12;
-    // The side of one 5×2 cell; the frame and the room around it are measured in these.
-    const cell = Math.max(
-        36,
+    // The side of the square frame; the room around it is measured in frame sides.
+    const side = Math.max(
+        96,
         Math.floor(
             Math.min(
-                (width - 2 * margin) / (FRAME_COLUMNS + (portrait ? 0.4 : 2.2)),
-                (height - 2 * margin) / (FRAME_ROWS + (portrait ? 3.4 : 1.7)),
+                (width - 2 * margin) / (portrait ? 1.08 : 2.3),
+                (height - 2 * margin) / (portrait ? 1.9 : 1.2),
             ),
         ),
     );
     const frame = {
-        x: Math.round((width - FRAME_COLUMNS * cell) / 2),
-        y: portrait ? margin + Math.round(cell * 0.2) : Math.round((height - FRAME_ROWS * cell) / 2),
-        width: FRAME_COLUMNS * cell,
-        height: FRAME_ROWS * cell,
+        x: Math.round((width - side) / 2),
+        y: portrait ? margin + Math.round(side * 0.04) : Math.round((height - side) / 2),
+        width: side,
+        height: side,
     };
     const piece = { x: frame.width / props.columns, y: frame.height / props.rows };
     const scale = Math.max(frame.width / image.naturalWidth, frame.height / image.naturalHeight);
@@ -87,7 +84,7 @@ function computeLayout({ width, height }) {
         piece,
         frame,
         scale,
-        // How far the scaled picture overflows the frame when it is not exactly 5:2.
+        // How far the scaled picture overflows the frame when it is not exactly square.
         overflow: {
             x: (image.naturalWidth * scale - frame.width) / 2,
             y: (image.naturalHeight * scale - frame.height) / 2,

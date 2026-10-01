@@ -104,8 +104,8 @@ onBeforeUnmount(() => {
                 v-if="pictureUrl"
                 :src="pictureUrl"
                 alt=""
-                class="w-full rounded-3xl border border-white/20 shadow-2xl shadow-black/40"
-                style="aspect-ratio: 5 / 2"
+                class="w-full max-w-md rounded-3xl border border-white/20 shadow-2xl shadow-black/40"
+                style="aspect-ratio: 1 / 1"
             />
 
             <section v-if="hasText" class="glass-card w-full px-6 py-7 sm:px-10">

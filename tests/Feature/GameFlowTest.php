@@ -84,7 +84,7 @@ test('play sends only the current picture and its message', function () {
         ->where('puzzle.imageUrl', $puzzles[2]->imageUrl())
         ->where('puzzle.message', $puzzles[2]->message)
         ->where('puzzle.leadMessage', $puzzles[2]->lead_message)
-        ->where('puzzle.grid', ['columns' => 5, 'rows' => 3])
+        ->where('puzzle.grid', ['columns' => 4, 'rows' => 4])
         ->where('puzzle.hint', 0.07)
         ->where('solvedCount', 2)
         ->where('advanceUrl', route('puzzles.solve', $puzzles[2]))
@@ -293,5 +293,5 @@ test('later pictures are cut into more pieces', function () {
     $game->puzzles->take(4)->each->update(['solved_at' => now()]);
 
     $this->actingAs($game->user)->get('/play')
-        ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 5)->where('puzzle.grid', ['columns' => 6, 'rows' => 3])->where('puzzle.hint', 0));
+        ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 5)->where('puzzle.grid', ['columns' => 5, 'rows' => 4])->where('puzzle.hint', 0));
 });
