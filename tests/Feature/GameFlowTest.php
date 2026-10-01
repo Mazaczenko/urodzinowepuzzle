@@ -66,7 +66,7 @@ test('the intro shows how far the player got', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Game/Intro')
             ->where('solvedCount', 1)
-            ->where('totalPuzzles', 9));
+            ->where('totalPuzzles', 6));
 });
 
 test('play sends only the current picture and its message', function () {
@@ -84,8 +84,8 @@ test('play sends only the current picture and its message', function () {
         ->where('puzzle.imageUrl', $puzzles[2]->imageUrl())
         ->where('puzzle.message', $puzzles[2]->message)
         ->where('puzzle.leadMessage', $puzzles[2]->lead_message)
-        ->where('puzzle.grid', ['columns' => 5, 'rows' => 2])
-        ->where('puzzle.hint', 0.16)
+        ->where('puzzle.grid', ['columns' => 5, 'rows' => 3])
+        ->where('puzzle.hint', 0.07)
         ->where('solvedCount', 2)
         ->where('advanceUrl', route('puzzles.solve', $puzzles[2]))
         ->where('preview', false));
@@ -170,7 +170,7 @@ test('the solve time must be a sensible number', function (mixed $seconds) {
 
 test('solving the last puzzle completes the game and opens the finale', function () {
     $game = Game::factory()->ready()->create();
-    $game->puzzles->take(8)->each->update(['solved_at' => now()]);
+    $game->puzzles->take(5)->each->update(['solved_at' => now()]);
 
     $this->actingAs($game->user)
         ->post(route('puzzles.solve', $game->puzzles->last()))
@@ -181,7 +181,7 @@ test('solving the last puzzle completes the game and opens the finale', function
 
 test('the finale stays locked until the game is completed', function () {
     $game = Game::factory()->ready()->create();
-    $game->puzzles->take(8)->each->update(['solved_at' => now()]);
+    $game->puzzles->take(5)->each->update(['solved_at' => now()]);
 
     $this->actingAs($game->user)->get('/finale')->assertRedirect(route('game.play'));
 });
@@ -210,12 +210,12 @@ test('finishing the game e-mails the organiser, and only then', function () {
     config(['app.game_completed_recipients' => ['m.piorkowska@fortis.pl', 'w.mazur@fortis.pl']]);
 
     $game = Game::factory()->ready()->create();
-    $game->puzzles->take(7)->each->update(['solved_at' => now()]);
+    $game->puzzles->take(4)->each->update(['solved_at' => now()]);
 
-    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[7]));
+    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[4]));
     Mail::assertNothingSent();
 
-    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[8]));
+    $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[5]));
 
     Mail::assertSent(GameCompleted::class, fn (GameCompleted $mail) => $mail->hasTo('m.piorkowska@fortis.pl')
         && $mail->hasTo('w.mazur@fortis.pl')
@@ -290,8 +290,8 @@ test('the preview shows the look of the previewed game', function () {
 
 test('later pictures are cut into more pieces', function () {
     $game = Game::factory()->ready()->create();
-    $game->puzzles->take(6)->each->update(['solved_at' => now()]);
+    $game->puzzles->take(4)->each->update(['solved_at' => now()]);
 
     $this->actingAs($game->user)->get('/play')
-        ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 7)->where('puzzle.grid', ['columns' => 6, 'rows' => 3])->where('puzzle.hint', 0));
+        ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 5)->where('puzzle.grid', ['columns' => 6, 'rows' => 3])->where('puzzle.hint', 0));
 });

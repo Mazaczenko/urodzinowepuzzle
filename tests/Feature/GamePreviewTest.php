@@ -30,10 +30,10 @@ test('the preview starts at the first picture and ends at the finale', function 
     $this->actingAs($admin)->get(route('preview.play', $game))
         ->assertInertia(fn (Assert $page) => $page->where('puzzle.number', 1)->where('solvedCount', 0));
 
-    $this->actingAs($admin)->get(route('preview.play', [$game, 9]))
+    $this->actingAs($admin)->get(route('preview.play', [$game, 6]))
         ->assertInertia(fn (Assert $page) => $page->where('advanceUrl', route('preview.finale', $game)));
 
-    $this->actingAs($admin)->get(route('preview.play', [$game, 10]))->assertNotFound();
+    $this->actingAs($admin)->get(route('preview.play', [$game, 7]))->assertNotFound();
 });
 
 test('an admin can preview the finale of an unfinished game', function () {

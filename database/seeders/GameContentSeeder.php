@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Fills in the player's game: the intro and closing texts, the music and the nine pictures,
+ * Fills in the player's game: the intro and closing texts, the music and the six pictures,
  * each with a text before it (a riddle about the next bike part) and after it ("Masz już…").
  *
  * The picture and music files are in the repository, so a fresh server only needs this seeder.
@@ -34,7 +34,7 @@ class GameContentSeeder extends Seeder
     ];
 
     /**
-     * Pictures 1 to 9, in order: the file in public/puzzles, the headline and text before it and the one after.
+     * Pictures in order (only the first Game::PUZZLES_COUNT are used): the file in public/puzzles, the headline and text before it and the one after.
      *
      * @var list<array{image: string, title: string, lead: string, message: string}>
      */
@@ -119,7 +119,7 @@ class GameContentSeeder extends Seeder
 
             $puzzles = $game->puzzles->keyBy('position');
 
-            foreach (self::PUZZLES as $index => $content) {
+            foreach (array_slice(self::PUZZLES, 0, Game::PUZZLES_COUNT) as $index => $content) {
                 $position = $index + 1;
                 $puzzle = $puzzles->get($position);
 

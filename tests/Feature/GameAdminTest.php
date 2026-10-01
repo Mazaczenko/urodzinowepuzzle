@@ -42,7 +42,7 @@ test('the games list shows whether a game is ready', function () {
         ->assertTableColumnStateSet('readiness', 'Niekompletna', $incomplete);
 
     expect(GameResource::missingParts($ready))->toBeNull()
-        ->and(GameResource::missingParts($incomplete))->toBe('Brakuje: obrazki (3 z 9), teksty przy obrazkach (3 bez tekstu)');
+        ->and(GameResource::missingParts($incomplete))->toBe('Brakuje: obrazki (3 z 6), teksty przy obrazkach (3 bez tekstu)');
 });
 
 test('an admin can create a game for the player', function () {
@@ -89,7 +89,7 @@ test('resetting progress clears solve times and dates but keeps the content', fu
     expect($game->fresh())
         ->started_at->toBeNull()
         ->completed_at->toBeNull()
-        ->and($game->puzzles()->count())->toBe(9)
+        ->and($game->puzzles()->count())->toBe(6)
         ->and($game->puzzles()->whereNotNull('solved_at')->orWhereNotNull('solve_seconds')->count())->toBe(0);
 });
 
@@ -104,10 +104,10 @@ test('uploaded pictures are cropped to 5:2 and stored as webp', function () {
         ->and([$width, $height])->toBe([Puzzle::IMAGE_WIDTH, Puzzle::IMAGE_HEIGHT]);
 });
 
-test('new pictures are appended and a tenth cannot be added', function () {
-    $game = Game::factory()->has(Puzzle::factory()->count(8))->create();
+test('new pictures are appended and a seventh cannot be added', function () {
+    $game = Game::factory()->has(Puzzle::factory()->count(5))->create();
 
-    expect(Puzzle::factory()->for($game)->create()->position)->toBe(9);
+    expect(Puzzle::factory()->for($game)->create()->position)->toBe(6);
 
     $this->actingAs($this->admin);
 
@@ -168,7 +168,7 @@ test('pictures can be reordered', function () {
         ->call('reorderTable', $reversed);
 
     expect($game->puzzles()->pluck('id')->all())->toBe($reversed)
-        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 9));
+        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 6));
 });
 
 test('a picture can be moved one place earlier or later', function () {
@@ -179,7 +179,7 @@ test('a picture can be moved one place earlier or later', function () {
 
     $manager = Livewire::test(PuzzlesRelationManager::class, ['ownerRecord' => $game, 'pageClass' => EditGame::class])
         ->assertTableActionHidden('moveEarlier', $first)
-        ->assertTableActionHidden('moveLater', $game->puzzles[8])
+        ->assertTableActionHidden('moveLater', $game->puzzles[5])
         ->callTableAction('moveLater', $first);
 
     expect($game->puzzles()->take(3)->pluck('id')->all())->toBe([$second->id, $first->id, $third->id]);
@@ -187,7 +187,7 @@ test('a picture can be moved one place earlier or later', function () {
     $manager->callTableAction('moveEarlier', $third);
 
     expect($game->puzzles()->take(3)->pluck('id')->all())->toBe([$second->id, $third->id, $first->id])
-        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 9));
+        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 6));
 });
 
 test('deleting a picture removes its file and closes the gap', function () {
@@ -200,7 +200,7 @@ test('deleting a picture removes its file and closes the gap', function () {
     $second->delete();
 
     Storage::disk('puzzles')->assertMissing($second->image_path);
-    expect($game->puzzles()->pluck('position')->all())->toBe(range(1, 8));
+    expect($game->puzzles()->pluck('position')->all())->toBe(range(1, 5));
 });
 
 test('the seeder creates three admins, the player and an empty game', function () {
@@ -247,10 +247,10 @@ test('the content seeder builds the whole game from the pictures in public/puzzl
 
     expect($game->intro_text)->toBe(GameContentSeeder::INTRO_TEXT)
         ->and($game->finale_text)->toBe('<p>Finał</p>')
-        ->and($game->puzzles()->pluck('image_path')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'image'))
-        ->and($game->puzzles()->pluck('message')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'message'))
-        ->and($game->puzzles()->pluck('lead_message')->all())->toBe(array_column(GameContentSeeder::PUZZLES, 'lead'))
-        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 9))
+        ->and($game->puzzles()->pluck('image_path')->all())->toBe(array_column(array_slice(GameContentSeeder::PUZZLES, 0, 6), 'image'))
+        ->and($game->puzzles()->pluck('message')->all())->toBe(array_column(array_slice(GameContentSeeder::PUZZLES, 0, 6), 'message'))
+        ->and($game->puzzles()->pluck('lead_message')->all())->toBe(array_column(array_slice(GameContentSeeder::PUZZLES, 0, 6), 'lead'))
+        ->and($game->puzzles()->pluck('position')->all())->toBe(range(1, 6))
         ->and($game->only(array_keys(GameContentSeeder::MUSIC)))->toBe(GameContentSeeder::MUSIC)
         ->and($game->isReady())->toBeTrue();
 });
@@ -264,7 +264,7 @@ test('the content seeder keeps pictures and texts added in the panel', function 
     $game->puzzles[1]->update(['message' => 'Zmienione w panelu']);
     $ownPictures = $game->puzzles->pluck('image_path')->all();
 
-    // No picture files on this disk, so the missing pictures 4 to 9 are skipped.
+    // No picture files on this disk, so the missing pictures 4 to 6 are skipped.
     $this->seed(GameContentSeeder::class);
 
     expect($game->fresh()->intro_text)->toBe('<p>Własny wstęp</p>')
@@ -321,10 +321,10 @@ test('an admin can set how hard the puzzles are', function () {
 
 test('the pictures get more pieces as the game goes on', function () {
     expect(Difficulty::Growing->grid(1))->toBe(['columns' => 5, 'rows' => 2])
-        ->and(Difficulty::Growing->grid(4))->toBe(['columns' => 5, 'rows' => 3])
-        ->and(Difficulty::Growing->grid(9))->toBe(['columns' => 6, 'rows' => 3])
-        ->and(Difficulty::Easy->grid(9))->toBe(['columns' => 5, 'rows' => 2])
-        ->and(Difficulty::Hard->grid(9))->toBe(['columns' => 8, 'rows' => 3]);
+        ->and(Difficulty::Growing->grid(3))->toBe(['columns' => 5, 'rows' => 3])
+        ->and(Difficulty::Growing->grid(6))->toBe(['columns' => 6, 'rows' => 3])
+        ->and(Difficulty::Easy->grid(6))->toBe(['columns' => 5, 'rows' => 2])
+        ->and(Difficulty::Hard->grid(6))->toBe(['columns' => 8, 'rows' => 3]);
 });
 
 test('the content seeder replaces a closing text draft that was never finished', function () {

@@ -32,7 +32,7 @@ class Game extends Model
     /**
      * How many pictures the player puts together, each followed by its message.
      */
-    public const int PUZZLES_COUNT = 9;
+    public const int PUZZLES_COUNT = 6;
 
     /**
      * @var array<string, mixed>

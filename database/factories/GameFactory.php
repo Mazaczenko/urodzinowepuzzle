@@ -27,7 +27,7 @@ class GameFactory extends Factory
     }
 
     /**
-     * A game with all nine pictures, ready to be played.
+     * A game with all six pictures, ready to be played.
      */
     public function ready(): static
     {

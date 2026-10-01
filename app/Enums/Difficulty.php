@@ -27,8 +27,8 @@ enum Difficulty: string implements HasDescription, HasLabel
     {
         return match ($this) {
             self::Easy => 'Każdy obrazek ma 10 kawałków, a w ramce cały czas widać podpowiedź.',
-            self::Growing => 'Obrazki 1–3 po 10 kawałków, 4–6 po 15, 7–9 po 18. Podpowiedź w ramce słabnie i na koniec znika. Domyślny.',
-            self::Hard => 'Obrazki 1–3 po 15 kawałków, 4–6 po 18, 7–9 po 24. Podpowiedź tylko na początku.',
+            self::Growing => 'Obrazki 1–2 po 10 kawałków, 3–4 po 15, 5–6 po 18. Podpowiedź w ramce słabnie i na koniec znika. Domyślny.',
+            self::Hard => 'Obrazki 1–2 po 15 kawałków, 3–4 po 18, 5–6 po 24. Podpowiedź tylko na początku.',
         };
     }
 
@@ -43,11 +43,11 @@ enum Difficulty: string implements HasDescription, HasLabel
             self::Hard => [0.07, 0.0, 0.0],
         };
 
-        return $hints[min(2, intdiv(max($position, 1) - 1, 3))];
+        return $hints[min(2, intdiv(max($position, 1) - 1, 2))];
     }
 
     /**
-     * The grid for the picture at the given position (1–9): columns × rows.
+     * The grid for the picture at the given position (1–6): columns × rows.
      *
      * Pictures are 5:2, so 5×2 gives square pieces; the other grids are close to square
      * and still fit a phone held upright.
@@ -62,7 +62,7 @@ enum Difficulty: string implements HasDescription, HasLabel
             self::Hard => [[5, 3], [6, 3], [8, 3]],
         };
 
-        [$columns, $rows] = $grids[min(2, intdiv(max($position, 1) - 1, 3))];
+        [$columns, $rows] = $grids[min(2, intdiv(max($position, 1) - 1, 2))];
 
         return ['columns' => $columns, 'rows' => $rows];
     }
