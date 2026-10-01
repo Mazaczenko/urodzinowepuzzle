@@ -18,7 +18,7 @@ class GameCompleted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mirek ułożył puzzle 🧩 czas bliknąć kasę!',
+            subject: 'Mirek ułożył puzzle !',
         );
     }
 

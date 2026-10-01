@@ -207,7 +207,7 @@ test('a completed game skips straight to the finale', function (string $uri) {
 
 test('finishing the game e-mails the organiser, and only then', function () {
     Mail::fake();
-    config(['app.game_completed_recipient' => 'm.piorko@fortis.pl']);
+    config(['app.game_completed_recipients' => ['m.piorkowska@fortis.pl', 'w.mazur@fortis.pl']]);
 
     $game = Game::factory()->ready()->create();
     $game->puzzles->take(7)->each->update(['solved_at' => now()]);
@@ -217,17 +217,18 @@ test('finishing the game e-mails the organiser, and only then', function () {
 
     $this->actingAs($game->user)->post(route('puzzles.solve', $game->puzzles[8]));
 
-    Mail::assertSent(GameCompleted::class, fn (GameCompleted $mail) => $mail->hasTo('m.piorko@fortis.pl')
+    Mail::assertSent(GameCompleted::class, fn (GameCompleted $mail) => $mail->hasTo('m.piorkowska@fortis.pl')
+        && $mail->hasTo('w.mazur@fortis.pl')
         && $mail->game->is($game));
     Mail::assertSentCount(1);
 });
 
-test('the completion e-mail tells the organiser to send the money', function () {
+test('the completion e-mail says Mirek has put the puzzles together', function () {
     $game = Game::factory()->completed()->create();
 
     (new GameCompleted($game))
-        ->assertHasSubject('Mirek ułożył puzzle 🧩 czas bliknąć kasę!')
-        ->assertSeeInHtml('Trzeba mu bliknąć kasę.');
+        ->assertHasSubject('Mirek ułożył puzzle !')
+        ->assertSeeInHtml('Mirek ułożył puzzle !');
 });
 
 test('the birthday wishes open the game on the intro screen', function () {

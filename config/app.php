@@ -37,7 +37,7 @@ return [
     |
     */
 
-    'game_completed_recipient' => env('GAME_COMPLETED_RECIPIENT', 'm.piorko@fortis.pl'),
+    'game_completed_recipients' => array_filter(array_map('trim', explode(',', (string) env('GAME_COMPLETED_RECIPIENTS', 'm.piorkowska@fortis.pl,w.mazur@fortis.pl')))),
 
     /*
     |--------------------------------------------------------------------------

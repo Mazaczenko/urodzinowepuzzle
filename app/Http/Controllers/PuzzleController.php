@@ -38,7 +38,7 @@ class PuzzleController extends Controller
             // Sent after the response, so a slow or failing mail server never holds up the finale.
             defer(function () use ($game): void {
                 try {
-                    Mail::to(config('app.game_completed_recipient'))->send(new GameCompleted($game));
+                    Mail::to(config('app.game_completed_recipients'))->send(new GameCompleted($game));
                 } catch (Throwable $exception) {
                     report($exception);
                 }
