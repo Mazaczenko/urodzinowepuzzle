@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-use function Illuminate\Support\defer;
-
 class PuzzleController extends Controller
 {
     /**
@@ -35,14 +33,12 @@ class PuzzleController extends Controller
         if ($game->currentPuzzle() === null) {
             $game->update(['completed_at' => now()]);
 
-            // Sent after the response, so a slow or failing mail server never holds up the finale.
-            defer(function () use ($game): void {
-                try {
-                    Mail::to(config('app.game_completed_recipients'))->send(new GameCompleted($game));
-                } catch (Throwable $exception) {
-                    report($exception);
-                }
-            });
+            // Sent straight away, but a failing mail server must never keep the player from the finale.
+            try {
+                Mail::to(config('app.game_completed_recipients'))->send(new GameCompleted($game));
+            } catch (Throwable $exception) {
+                report($exception);
+            }
 
             return to_route('game.finale');
         }

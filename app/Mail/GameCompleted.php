@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use App\Models\Game;
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -11,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 class GameCompleted extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public function __construct(public Game $game) {}
 
